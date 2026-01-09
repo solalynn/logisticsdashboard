@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics KPI Dashboard - December 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --suntory-blue: #0066CC;
+            --suntory-light-blue: #4DA6FF;
+            --suntory-sky: #E6F2FF;
+            --primary-text: #1a1a1a;
+            --secondary-text: #666666;
+            --border: #d4e6f7;
+            --white: #ffffff;
+            --accent-orange: #FF6B35;
+            --accent-green: #00B894;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+            color: var(--primary-text);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 3px solid var(--suntory-blue);
+            padding-bottom: 1.5rem;
+        }
+        
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--suntory-blue);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .period {
+            font-family: 'Outfit', sans-serif;
+            color: var(--secondary-text);
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.08);
+        }
+        
+        .metric-card:hover {
+            border-color: var(--suntory-blue);
+            box-shadow: 0 4px 16px rgba(0, 102, 204, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary-text);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .metric-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--suntory-blue);
+            margin-bottom: 0.25rem;
+            line-height: 1;
+        }
+        
+        .metric-subtext {
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+            font-weight: 400;
+        }
+        
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.08);
+        }
+        
+        .chart-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--suntory-blue);
+            font-weight: 700;
+        }
+        
+        .data-table-section {
+            margin-top: 1.5rem;
+        }
+        
+        .table-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.08);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+        }
+        
+        thead {
+            background: var(--suntory-sky);
+        }
+        
+        th {
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid var(--suntory-blue);
+            font-weight: 700;
+            color: var(--suntory-blue);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--primary-text);
+        }
+        
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background: var(--suntory-sky);
+        }
+        
+        .number {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+        
+        .supplier-tag {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .supplier-MON { background: #E8F5E9; color: #00B894; border: 1px solid #00B894; }
+        .supplier-CLS { background: #E3F2FD; color: #0066CC; border: 1px solid #0066CC; }
+        .supplier-DHL { background: #FFF3E0; color: #FF6B35; border: 1px solid #FF6B35; }
+        .supplier-UET { background: #F5F5F5; color: #666666; border: 1px solid #999999; }
+        
+        @media (max-width: 1024px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Logistics Performance Dashboard</h1>
+            <div class="period">December 2025 • Freight & Distribution Analytics</div>
+        </header>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Deliveries</div>
+                <div class="metric-value">4,477</div>
+                <div class="metric-subtext">Delivery Orders</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Total Trips</div>
+                <div class="metric-value">4,474</div>
+                <div class="metric-subtext">Unique Journeys</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Pallets Shipped</div>
+                <div class="metric-value">105,873</div>
+                <div class="metric-subtext">Total Volume</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Freight Revenue</div>
+                <div class="metric-value">฿47.5M</div>
+                <div class="metric-subtext">Total Freight Amount</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">฿50.1M</div>
+                <div class="metric-subtext">Operating Expenses</div>
+            </div>
+        </div>
+        
+        <div class="charts-section">
+            <div class="chart-card">
+                <div class="chart-title">Cost Analysis by Supplier</div>
+                <canvas id="supplierChart"></canvas>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-title">Volume Distribution by Supplier</div>
+                <canvas id="volumeChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="data-table-section">
+            <div class="table-card">
+                <div class="chart-title" style="margin-bottom: 1rem;">Top Performing Suppliers</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Supplier</th>
+                            <th>Trips</th>
+                            <th>Deliveries</th>
+                            <th>Pallets</th>
+                            <th>Freight Amount</th>
+                            <th>Total Cost</th>
+                            <th>Avg Cost/Trip</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="supplier-tag supplier-MON">MON</span></td>
+                            <td class="number">1,939</td>
+                            <td class="number">1,942</td>
+                            <td class="number">43,732</td>
+                            <td class="number">฿14,362,056</td>
+                            <td class="number">฿15,055,032</td>
+                            <td class="number">฿7,763</td>
+                        </tr>
+                        <tr>
+                            <td><span class="supplier-tag supplier-DHL">DHL</span></td>
+                            <td class="number">1,371</td>
+                            <td class="number">1,371</td>
+                            <td class="number">34,896</td>
+                            <td class="number">฿16,788,909</td>
+                            <td class="number">฿17,171,209</td>
+                            <td class="number">฿12,525</td>
+                        </tr>
+                        <tr>
+                            <td><span class="supplier-tag supplier-CLS">CLS</span></td>
+                            <td class="number">752</td>
+                            <td class="number">752</td>
+                            <td class="number">17,219</td>
+                            <td class="number">฿12,339,011</td>
+                            <td class="number">฿12,400,511</td>
+                            <td class="number">฿16,490</td>
+                        </tr>
+                        <tr>
+                            <td><span class="supplier-tag supplier-UET">UET</span></td>
+                            <td class="number">412</td>
+                            <td class="number">412</td>
+                            <td class="number">10,026</td>
+                            <td class="number">฿5,455,080</td>
+                            <td class="number">฿5,471,080</td>
+                            <td class="number">฿13,279</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Cost Analysis by Supplier Chart
+        const supplierCtx = document.getElementById('supplierChart').getContext('2d');
+        new Chart(supplierCtx, {
+            type: 'bar',
+            data: {
+                labels: ['MON', 'DHL', 'CLS', 'UET'],
+                datasets: [{
+                    label: 'Freight Amount (Million ฿)',
+                    data: [14.36, 16.79, 12.34, 5.46],
+                    backgroundColor: 'rgba(0, 102, 204, 0.7)',
+                    borderColor: 'rgba(0, 102, 204, 1)',
+                    borderWidth: 2,
+                    borderRadius: 6
+                }, {
+                    label: 'Total Cost (Million ฿)',
+                    data: [15.06, 17.17, 12.40, 5.47],
+                    backgroundColor: 'rgba(77, 166, 255, 0.7)',
+                    borderColor: 'rgba(77, 166, 255, 1)',
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(212, 230, 247, 0.5)'
+                        },
+                        ticks: {
+                            color: '#666666',
+                            font: {
+                                family: 'Outfit',
+                                size: 11
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#1a1a1a',
+                            font: {
+                                family: 'Outfit',
+                                weight: '600',
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#1a1a1a',
+                            font: {
+                                family: 'Outfit',
+                                size: 12,
+                                weight: '500'
+                            },
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Volume Distribution Chart
+        const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+        new Chart(volumeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['MON', 'DHL', 'CLS', 'UET'],
+                datasets: [{
+                    data: [43732, 34896, 17219, 10026],
+                    backgroundColor: [
+                        'rgba(0, 102, 204, 0.8)',
+                        'rgba(77, 166, 255, 0.8)',
+                        'rgba(0, 184, 148, 0.8)',
+                        'rgba(255, 107, 53, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(0, 102, 204, 1)',
+                        'rgba(77, 166, 255, 1)',
+                        'rgba(0, 184, 148, 1)',
+                        'rgba(255, 107, 53, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            color: '#1a1a1a',
+                            font: {
+                                family: 'Outfit',
+                                size: 12,
+                                weight: '600'
+                            },
+                            padding: 15,
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map(function(label, i) {
+                                        const value = data.datasets[0].data[i];
+                                        const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return {
+                                            text: `${label}: ${percentage}% (${value.toLocaleString()} pallets)`,
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: false,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                return `${label}: ${value.toLocaleString()} pallets`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
