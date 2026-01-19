@@ -1,59 +1,82 @@
-import graphviz
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interactive Supply Chain Network</title>
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style type="text/css">
+    #mynetwork {
+      width: 100%;
+      height: 800px;
+      border: 1px solid lightgray;
+      background-color: #f9f9f9;
+    }
+    body { font-family: Arial, sans-serif; }
+    .legend {
+        margin-bottom: 10px; padding: 10px;
+        background: #eee; border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
 
-# Create a new directed graph
-dot = graphviz.Digraph(comment='Supply Chain Network', format='png')
-dot.attr(rankdir='TB')  # Top to Bottom layout
-dot.attr('node', fontname='Helvetica', fontsize='12')
+<h2>Supply Chain Network: Rayong & Saraburi</h2>
 
-# 1. Define The Main Hubs (Red Squares)
-with dot.subgraph(name='cluster_hubs') as c:
-    c.attr(style='invis')
-    c.attr('node', shape='square', style='filled', fillcolor='#C00000', fontcolor='white', width='1.5', height='1.5', fixedsize='true')
-    c.node('7101', 'Rayong Plant &\nDistribution Center\n(7101)')
-    c.node('7102', 'Saraburi Plant &\nDistribution Center\n(7102)')
+<div class="legend">
+    <strong>Legend:</strong>
+    <span style="color:#C00000">■ Main Hubs</span> | 
+    <span style="color:#0070C0">■ Modern Trade (MT)</span> | 
+    <span style="color:#00B050">● Traditional Trade (TT)</span> <br>
+    <strong>Lines:</strong> 
+    <span style="color:#C00000; font-weight:bold;">── Interplant</span> | 
+    <span style="color:black">── Direct</span> | 
+    <span style="color:#ED7D31">── Multi-Combine</span> | 
+    <span style="color:gray; border-bottom: 1px dashed gray;">-- Backhaul</span>
+</div>
 
-# 2. Define The Satellites (Blue = MT, Green = TT)
-# Rayong Satellites
-dot.attr('node', shape='rect', style='filled', fillcolor='#0070C0', fontcolor='white', width='1.0', fixedsize='false')
-dot.node('MT1', 'Modern Trade\n(MT)')
-dot.node('MT2', 'Modern Trade\n(MT)')
+<div id="mynetwork"></div>
 
-dot.attr('node', shape='circle', style='filled', fillcolor='#00B050', fontcolor='white', width='1.0', fixedsize='false')
-dot.node('TT1', 'Traditional Trade\n(TT)')
-dot.node('TT2', 'Traditional Trade\n(TT)')
+<script type="text/javascript">
+  // 1. Define Nodes (The shapes)
+  var nodes = new vis.DataSet([
+    {id: '7101', label: 'Rayong Plant & DC\n(7101)', shape: 'box', color: '#C00000', font: {color: 'white', size: 20}, margin: 20},
+    {id: '7102', label: 'Saraburi Plant & DC\n(7102)', shape: 'box', color: '#C00000', font: {color: 'white', size: 20}, margin: 20},
+    {id: 'MT1', label: 'Modern Trade\n(MT)', shape: 'box', color: '#0070C0', font: {color: 'white'}},
+    {id: 'MT2', label: 'Modern Trade\n(MT)', shape: 'box', color: '#0070C0', font: {color: 'white'}},
+    {id: 'TT1', label: 'Traditional Trade\n(TT)', shape: 'dot', color: '#00B050', font: {color: 'white'}},
+    {id: 'TT2', label: 'Traditional Trade\n(TT)', shape: 'dot', color: '#00B050', font: {color: 'white'}},
+    {id: 'MT3', label: 'Modern Trade\n(MT)', shape: 'box', color: '#0070C0', font: {color: 'white'}},
+    {id: 'TT3', label: 'Traditional Trade\n(TT)', shape: 'dot', color: '#00B050', font: {color: 'white'}},
+    {id: 'TT4', label: 'Traditional Trade\n(TT)', shape: 'dot', color: '#00B050', font: {color: 'white'}}
+  ]);
 
-# Saraburi Satellites
-dot.attr('node', shape='rect', style='filled', fillcolor='#0070C0', fontcolor='white', width='1.0')
-dot.node('MT3', 'Modern Trade\n(MT)')
+  // 2. Define Edges (The lines)
+  var edges = new vis.DataSet([
+    {from: '7101', to: '7102', color: {color:'#C00000'}, width: 4, arrows: 'to, from', label: 'Interplant Transfer'},
+    {from: '7101', to: 'MT1', color: {color:'black'}, arrows: 'to', label: 'Direct'},
+    {from: '7101', to: 'TT1', color: {color:'black'}, arrows: 'to'},
+    {from: '7101', to: 'MT2', color: {color:'#ED7D31'}, width: 2, arrows: 'to', label: 'Multi-Combine'},
+    {from: 'MT2', to: 'TT2', color: {color:'#ED7D31'}, width: 2, arrows: 'to'},
+    {from: '7102', to: 'MT3', color: {color:'black'}, arrows: 'to', label: 'Direct'},
+    {from: '7102', to: 'TT3', color: {color:'black'}, arrows: 'to'},
+    {from: 'TT4', to: '7102', color: {color:'gray'}, dashes: true, arrows: 'to', label: 'Raw Material Backhaul'}
+  ]);
 
-dot.attr('node', shape='circle', style='filled', fillcolor='#00B050', fontcolor='white', width='1.0')
-dot.node('TT3', 'Traditional Trade\n(TT)')
-dot.node('TT4', 'Traditional Trade\n(TT)')
+  // 3. Render the Network
+  var container = document.getElementById('mynetwork');
+  var data = { nodes: nodes, edges: edges };
+  var options = {
+    physics: {
+        enabled: true,
+        solver: 'forceAtlas2Based',
+        forceAtlas2Based: { gravitationalConstant: -100, springLength: 200, springConstant: 0.18 },
+        stabilization: {iterations: 150}
+    },
+    layout: {
+        hierarchical: { enabled: true, direction: 'UD', sortMethod: 'directed', levelSeparation: 150, nodeSpacing: 200 }
+    }
+  };
+  var network = new vis.Network(container, data, options);
+</script>
 
-
-# 3. Connections
-
-# 1.1 Interplant Transfer (Red, thick, double-headed)
-dot.edge('7101', '7102', label='Interplant Transfer', color='#C00000', penwidth='3.0', dir='both')
-
-# Direct to Customer (From Rayong)
-dot.edge('7101', 'MT1', color='black', label='Direct')
-dot.edge('7101', 'TT1', color='black')
-
-# Multi-Combine Example (Rayong -> MT2 -> TT2) - Orange line
-dot.edge('7101', 'MT2', color='#ED7D31', penwidth='2.0', label='Multi-Combine')
-dot.edge('MT2', 'TT2', color='#ED7D31', penwidth='2.0')
-
-# Direct to Customer (From Saraburi)
-dot.edge('7102', 'MT3', color='black', label='Direct')
-dot.edge('7102', 'TT3', color='black')
-
-# Raw Material Backhaul (Dashed line from Customer back to Plant)
-dot.edge('TT4', '7102', style='dashed', color='gray', label='Raw Material\nBackhaul', constraint='false')
-dot.edge('7102', 'TT4', style='invis') # Invisible edge to force layout logic if needed, but mostly direct
-
-# Add a legend node manually to explain colors if needed, but labels are clear.
-
-# Render the graph
-file_path = 'supply_chain_network'
-dot.render(file_path, view=False)
+</body>
+</html>
