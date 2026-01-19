@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supply Chain Network - Rayong & Saraburi Distribution</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500&display=swap');
         
         * {
             margin: 0;
@@ -13,119 +13,187 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --suntory-blue: #0039A6;
+            --suntory-light-blue: #0066CC;
+            --suntory-dark-blue: #002B78;
+            --accent-blue: #3399FF;
+            --bg-white: #FFFFFF;
+            --bg-light: #F8FAFD;
+            --text-dark: #1a1a1a;
+            --text-gray: #666;
+            --border-color: #E0E8F0;
+        }
+        
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f5ff 50%, #e6f0ff 100%);
+            color: var(--text-dark);
             padding: 2rem;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            background: var(--bg-white);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 57, 166, 0.15);
             overflow: hidden;
+            border: 2px solid var(--border-color);
         }
         
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
+            background: linear-gradient(135deg, var(--suntory-blue) 0%, var(--suntory-light-blue) 100%);
+            padding: 2.5rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
         
         h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
+            color: white;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.02em;
         }
         
         .subtitle {
-            font-size: 1rem;
-            opacity: 0.95;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.95);
+            position: relative;
+            z-index: 1;
+            font-weight: 400;
         }
         
         .content {
-            padding: 2rem;
+            padding: 2.5rem;
         }
         
         .controls {
             display: flex;
             gap: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
             align-items: center;
         }
         
         .btn {
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0.85rem 1.75rem;
+            background: linear-gradient(135deg, var(--suntory-blue) 0%, var(--suntory-light-blue) 100%);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 57, 166, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 57, 166, 0.35);
         }
         
         .btn:active {
             transform: translateY(0);
         }
         
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
         .zoom-info {
-            padding: 0.75rem 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: #495057;
-            font-weight: 500;
+            padding: 0.85rem 1.5rem;
+            background: var(--bg-light);
+            border: 2px solid var(--suntory-light-blue);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--suntory-blue);
+            font-weight: 700;
+            font-family: 'Roboto', monospace;
         }
         
         .legend-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 12px;
-            border: 2px solid #e9ecef;
+            padding: 2rem;
+            background: var(--bg-light);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
         }
         
         .legend-section {
             background: white;
-            padding: 1.25rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 57, 166, 0.08);
         }
         
         .legend-title {
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #495057;
+            letter-spacing: 0.1em;
+            color: var(--suntory-blue);
             margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--suntory-light-blue);
         }
         
         .legend-item {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            margin-bottom: 0.75rem;
-            font-size: 0.9rem;
+            margin-bottom: 0.85rem;
+            font-size: 0.95rem;
+            color: var(--text-dark);
         }
         
         .legend-item:last-child {
@@ -133,19 +201,19 @@
         }
         
         .node-box {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             border-radius: 4px;
             flex-shrink: 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0, 57, 166, 0.2);
         }
         
         .node-circle {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             flex-shrink: 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0, 57, 166, 0.2);
         }
         
         .node-triangle {
@@ -153,22 +221,22 @@
             height: 0;
             border-left: 12px solid transparent;
             border-right: 12px solid transparent;
-            border-bottom: 20px solid #FFC107;
+            border-bottom: 20px solid #FFA500;
             margin-left: 2px;
         }
         
         .line-sample {
-            width: 50px;
+            width: 55px;
             height: 3px;
             flex-shrink: 0;
         }
         
         .diagram-container {
             background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0, 57, 166, 0.1);
+            border: 2px solid var(--border-color);
             overflow: hidden;
             position: relative;
         }
@@ -177,6 +245,9 @@
             overflow: hidden;
             cursor: grab;
             user-select: none;
+            position: relative;
+            background: radial-gradient(circle at center, #ffffff 0%, #f8fafd 100%);
+            border-radius: 12px;
         }
         
         .svg-wrapper:active {
@@ -194,12 +265,20 @@
             font-weight: 700;
             font-size: 18px;
             fill: white;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .hub-code {
+            font-size: 13px;
+            fill: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
         }
         
         .node-label {
             font-size: 11px;
-            fill: #666;
+            fill: var(--text-gray);
             font-weight: 600;
+            font-family: 'Roboto', sans-serif;
         }
         
         .interactive-node {
@@ -208,7 +287,7 @@
         }
         
         .interactive-node:hover {
-            filter: brightness(1.2) drop-shadow(0 0 8px rgba(0,0,0,0.3));
+            filter: brightness(1.2) drop-shadow(0 0 10px rgba(0, 57, 166, 0.5));
         }
         
         .interactive-line {
@@ -217,25 +296,39 @@
         }
         
         .interactive-line:hover {
-            filter: drop-shadow(0 0 4px currentColor);
+            filter: drop-shadow(0 0 6px currentColor);
         }
         
         .tooltip {
             position: absolute;
-            background: rgba(0, 0, 0, 0.85);
+            background: var(--suntory-dark-blue);
+            border: 2px solid var(--suntory-light-blue);
             color: white;
-            padding: 0.5rem 0.75rem;
-            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
             font-size: 0.85rem;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.2s ease;
             z-index: 1000;
             white-space: nowrap;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 57, 166, 0.3);
         }
         
         .tooltip.show {
             opacity: 1;
+        }
+        
+        .info-note {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(0, 57, 166, 0.05) 0%, rgba(51, 153, 255, 0.05) 100%);
+            border-left: 4px solid var(--suntory-blue);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
         }
         
         @media (max-width: 768px) {
@@ -244,7 +337,7 @@
             }
             
             h1 {
-                font-size: 1.5rem;
+                font-size: 1.75rem;
             }
             
             .legend-container {
@@ -261,29 +354,29 @@
 <body>
     <div class="container">
         <header>
-            <h1>Interactive Supply Chain Network</h1>
-            <p class="subtitle">Distribution System: Rayong Plant (7101) & Saraburi Plant (7102)</p>
+            <h1>Supply Chain Network</h1>
+            <p class="subtitle">Distribution System: Rayong Plant (7101) ↔ Saraburi Plant (7102)</p>
         </header>
         
         <div class="content">
             <div class="controls">
-                <button class="btn" onclick="zoomIn()">🔍 Zoom In</button>
-                <button class="btn" onclick="zoomOut()">🔍 Zoom Out</button>
-                <button class="btn" onclick="resetView()">↺ Reset View</button>
+                <button class="btn" onclick="zoomIn()"><span>🔍 Zoom In</span></button>
+                <button class="btn" onclick="zoomOut()"><span>🔍 Zoom Out</span></button>
+                <button class="btn" onclick="resetView()"><span>↺ Reset View</span></button>
                 <div class="zoom-info">
-                    <span id="zoomLevel">Zoom: 100%</span>
+                    <span id="zoomLevel">ZOOM: 100%</span>
                 </div>
             </div>
             
             <div class="legend-container">
                 <div class="legend-section">
-                    <div class="legend-title">Main Hubs</div>
+                    <div class="legend-title">Main Distribution Centers</div>
                     <div class="legend-item">
-                        <div class="node-box" style="background: #C00000;"></div>
+                        <div class="node-box" style="background: var(--suntory-blue);"></div>
                         <span><strong>Rayong Plant & DC (7101)</strong></span>
                     </div>
                     <div class="legend-item">
-                        <div class="node-box" style="background: #C00000;"></div>
+                        <div class="node-box" style="background: var(--suntory-blue);"></div>
                         <span><strong>Saraburi Plant & DC (7102)</strong></span>
                     </div>
                 </div>
@@ -307,7 +400,7 @@
                 <div class="legend-section">
                     <div class="legend-title">Connection Types</div>
                     <div class="legend-item">
-                        <div class="line-sample" style="background: #C00000; height: 5px;"></div>
+                        <div class="line-sample" style="background: var(--suntory-blue); height: 5px;"></div>
                         <span>Interplant Transfer</span>
                     </div>
                     <div class="legend-item">
@@ -316,7 +409,7 @@
                     </div>
                     <div class="legend-item">
                         <div class="line-sample" style="background: #FF8C00; height: 4px;"></div>
-                        <span>Multi-Combine</span>
+                        <span>Multi-Combine Delivery</span>
                     </div>
                     <div class="legend-item">
                         <div class="line-sample" style="background: repeating-linear-gradient(to right, #999 0, #999 8px, transparent 8px, transparent 14px);"></div>
@@ -327,196 +420,263 @@
             
             <div class="diagram-container">
                 <div class="svg-wrapper" id="svgWrapper">
-                    <svg id="networkSvg" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+                    <svg id="networkSvg" viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                                <path d="M0,0 L0,6 L9,3 z" fill="#C00000" />
+                            <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#0039A6" />
                             </marker>
-                            <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
                                 <path d="M0,0 L0,6 L9,3 z" fill="#00B050" />
                             </marker>
-                            <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <marker id="arrowOrange" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
                                 <path d="M0,0 L0,6 L9,3 z" fill="#FF8C00" />
                             </marker>
-                            <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <marker id="arrowGray" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
                                 <path d="M0,0 L0,6 L9,3 z" fill="#999" />
                             </marker>
+                            
+                            <!-- Glow filters -->
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
                         </defs>
                         
-                        <!-- Main Hub: Rayong Plant (7101) - Top Left -->
+                        <!-- RAYONG PLANT (7101) - Left Side -->
                         <g class="interactive-node" data-tooltip="Rayong Plant & DC (7101) - Main Hub">
-                            <rect x="50" y="50" width="140" height="70" fill="#C00000" stroke="#8B0000" stroke-width="3" rx="5"/>
-                            <text x="120" y="80" class="hub-label" text-anchor="middle">Rayong Plant</text>
-                            <text x="120" y="100" class="hub-label" text-anchor="middle">(7101)</text>
+                            <rect x="150" y="400" width="180" height="85" fill="#0039A6" stroke="#0066CC" stroke-width="4" rx="10" filter="url(#glow)"/>
+                            <text x="240" y="430" class="hub-label" text-anchor="middle">Rayong Plant</text>
+                            <text x="240" y="455" class="hub-code" text-anchor="middle">(7101)</text>
                         </g>
                         
-                        <!-- Main Hub: Saraburi Plant (7102) - Top Right -->
+                        <!-- SARABURI PLANT (7102) - Right Side -->
                         <g class="interactive-node" data-tooltip="Saraburi Plant & DC (7102) - Main Hub">
-                            <rect x="1010" y="50" width="140" height="70" fill="#C00000" stroke="#8B0000" stroke-width="3" rx="5"/>
-                            <text x="1080" y="80" class="hub-label" text-anchor="middle">Saraburi Plant</text>
-                            <text x="1080" y="100" class="hub-label" text-anchor="middle">(7102)</text>
+                            <rect x="1070" y="400" width="180" height="85" fill="#0039A6" stroke="#0066CC" stroke-width="4" rx="10" filter="url(#glow)"/>
+                            <text x="1160" y="430" class="hub-label" text-anchor="middle">Saraburi Plant</text>
+                            <text x="1160" y="455" class="hub-code" text-anchor="middle">(7102)</text>
                         </g>
                         
-                        <!-- Interplant Transfer Line (Red, bidirectional) -->
-                        <line class="interactive-line" data-tooltip="Interplant Transfer - Bidirectional" x1="190" y1="85" x2="1010" y2="85" stroke="#C00000" stroke-width="6" marker-end="url(#arrowRed)"/>
-                        <line class="interactive-line" x1="1010" y1="85" x2="190" y2="85" stroke="#C00000" stroke-width="6" marker-end="url(#arrowRed)" opacity="0.7"/>
-                        <text x="600" y="75" class="node-label" text-anchor="middle" fill="#C00000" font-size="13">Interplant Transfer</text>
+                        <!-- INTERPLANT TRANSFER (Main Connection) -->
+                        <line class="interactive-line" data-tooltip="Interplant Transfer - Bidirectional" 
+                              x1="330" y1="442" x2="1070" y2="442" 
+                              stroke="#0039A6" stroke-width="8" marker-end="url(#arrowBlue)" opacity="0.9"/>
+                        <line class="interactive-line" 
+                              x1="1070" y1="442" x2="330" y2="442" 
+                              stroke="#0039A6" stroke-width="8" marker-end="url(#arrowBlue)" opacity="0.6"/>
+                        <text x="700" y="425" class="node-label" text-anchor="middle" fill="#0039A6" font-size="14" font-weight="700">Interplant Transfer</text>
                         
-                        <!-- RAYONG (7101) CUSTOMERS -->
+                        <!-- RAYONG SATELLITES (Left Side) -->
                         
-                        <!-- Modern Trade 1 -->
+                        <!-- MT Cluster - Top Left -->
                         <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="80" y="250" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
-                            <text x="100" y="240" class="node-label" text-anchor="middle">MT</text>
+                            <rect x="50" y="150" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
+                            <text x="75" y="130" class="node-label" text-anchor="middle">MT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" x1="120" y1="120" x2="100" y2="250" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="200" y1="400" x2="75" y2="200" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
                         
-                        <!-- Modern Trade 2 with TT cluster -->
                         <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="200" y="280" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
-                            <text x="220" y="270" class="node-label" text-anchor="middle">MT</text>
+                            <rect x="170" y="200" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
+                            <text x="195" y="180" class="node-label" text-anchor="middle">MT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" x1="120" y1="120" x2="220" y2="280" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="220" y1="400" x2="195" y2="250" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
                         
-                        <!-- TT connected to MT2 -->
+                        <!-- TT Cluster - Left Side -->
                         <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="280" cy="380" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="280" y="420" class="node-label" text-anchor="middle">TT</text>
+                            <circle cx="80" cy="320" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="80" y="360" class="node-label" text-anchor="middle">TT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" x1="240" y1="300" x2="280" y2="380" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
-                        <text x="260" y="340" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">Multi</text>
-                        
-                        <!-- TT cluster 1 -->
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="100" cy="450" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="100" y="490" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" x1="120" y1="120" x2="100" y2="450" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="180" y1="410" x2="102" y2="330" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
                         
                         <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="170" cy="500" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="170" y="540" class="node-label" text-anchor="middle">TT</text>
+                            <circle cx="120" cy="560" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="120" y="600" class="node-label" text-anchor="middle">TT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" x1="100" y1="468" x2="170" y2="500" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="185" y1="485" x2="142" y2="550" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
                         
                         <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="230" cy="520" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="230" y="560" class="node-label" text-anchor="middle">TT</text>
+                            <circle cx="200" cy="650" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="200" y="690" class="node-label" text-anchor="middle">TT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" x1="170" y1="518" x2="230" y2="520" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
+                              x1="140" y1="570" x2="190" y2="640" 
+                              stroke="#FF8C00" stroke-width="3.5" marker-end="url(#arrowOrange)"/>
                         
-                        <!-- Vendors for Rayong (Arrows point TO plant) -->
+                        <!-- MT with Multi-combine -->
+                        <g class="interactive-node" data-tooltip="Modern Trade (MT)">
+                            <rect x="350" y="250" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
+                            <text x="375" y="230" class="node-label" text-anchor="middle">MT</text>
+                        </g>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="260" y1="400" x2="375" y2="300" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
+                        
+                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
+                            <circle cx="430" cy="180" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="430" y="160" class="node-label" text-anchor="middle">TT</text>
+                        </g>
+                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
+                              x1="390" y1="255" x2="420" y2="200" 
+                              stroke="#FF8C00" stroke-width="3.5" marker-end="url(#arrowOrange)"/>
+                        <text x="410" y="230" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">MC</text>
+                        
+                        <!-- Rayong Vendors (Raw material to plant) -->
                         <g class="interactive-node" data-tooltip="Raw Material Vendor → Rayong Plant">
-                            <path d="M 50,640 L 70,610 L 30,610 Z" fill="#FFC107" stroke="#FF8C00" stroke-width="2"/>
-                            <text x="50" y="660" class="node-label" text-anchor="middle">Vendor</text>
+                            <path d="M 240,720 L 265,690 L 215,690 Z" fill="#FFA500" stroke="#FFB300" stroke-width="2.5"/>
+                            <text x="240" y="750" class="node-label" text-anchor="middle" font-size="10">Vendor</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Rayong" x1="50" y1="610" x2="120" y2="120" stroke="#999" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arrowGray)"/>
+                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Rayong" 
+                              x1="240" y1="690" x2="240" y2="485" 
+                              stroke="#999" stroke-width="3" stroke-dasharray="10,6" marker-end="url(#arrowGray)"/>
                         
                         <g class="interactive-node" data-tooltip="Raw Material Vendor → Rayong Plant">
-                            <path d="M 180,680 L 200,650 L 160,650 Z" fill="#FFC107" stroke="#FF8C00" stroke-width="2"/>
-                            <text x="180" y="700" class="node-label" text-anchor="middle">Vendor</text>
+                            <path d="M 100,750 L 125,720 L 75,720 Z" fill="#FFA500" stroke="#FFB300" stroke-width="2.5"/>
+                            <text x="100" y="780" class="node-label" text-anchor="middle" font-size="10">Vendor</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Rayong" x1="180" y1="650" x2="120" y2="120" stroke="#999" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arrowGray)"/>
+                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Rayong" 
+                              x1="100" y1="720" x2="160" y2="485" 
+                              stroke="#999" stroke-width="3" stroke-dasharray="10,6" marker-end="url(#arrowGray)"/>
                         
-                        <!-- SARABURI (7102) CUSTOMERS -->
+                        <!-- SARABURI SATELLITES (Right Side) -->
                         
-                        <!-- Modern Trade 3 -->
+                        <!-- MT Cluster - Top Right -->
                         <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="1080" y="250" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
-                            <text x="1100" y="240" class="node-label" text-anchor="middle">MT</text>
+                            <rect x="1300" y="150" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
+                            <text x="1325" y="130" class="node-label" text-anchor="middle">MT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" x1="1080" y1="120" x2="1100" y2="250" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="1200" y1="400" x2="1325" y2="200" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
                         
-                        <!-- Modern Trade 4 with TT -->
                         <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="960" y="280" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
-                            <text x="980" y="270" class="node-label" text-anchor="middle">MT</text>
+                            <rect x="1180" y="200" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
+                            <text x="1205" y="180" class="node-label" text-anchor="middle">MT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" x1="1080" y1="120" x2="980" y2="280" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="1180" y1="400" x2="1205" y2="250" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
                         
-                        <!-- TT connected to MT4 -->
+                        <!-- TT Cluster - Right Side -->
                         <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="920" cy="380" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="920" y="420" class="node-label" text-anchor="middle">TT</text>
+                            <circle cx="1320" cy="320" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="1320" y="360" class="node-label" text-anchor="middle">TT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" x1="960" y1="300" x2="920" y2="380" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
-                        <text x="940" y="340" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">Multi</text>
-                        
-                        <!-- TT cluster 2 -->
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="1100" cy="450" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="1100" y="490" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" x1="1080" y1="120" x2="1100" y2="450" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="1220" y1="410" x2="1298" y2="330" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
                         
                         <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="1030" cy="500" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="1030" y="540" class="node-label" text-anchor="middle">TT</text>
+                            <circle cx="1280" cy="560" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="1280" y="600" class="node-label" text-anchor="middle">TT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" x1="1100" y1="468" x2="1030" y2="500" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="1215" y1="485" x2="1258" y2="550" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
                         
                         <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="970" cy="520" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="970" y="560" class="node-label" text-anchor="middle">TT</text>
+                            <circle cx="1200" cy="650" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="1200" y="690" class="node-label" text-anchor="middle">TT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" x1="1030" y1="518" x2="970" y2="520" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
+                              x1="1260" y1="570" x2="1210" y2="640" 
+                              stroke="#FF8C00" stroke-width="3.5" marker-end="url(#arrowOrange)"/>
                         
-                        <!-- Vendors for Saraburi (Arrows point TO plant) -->
+                        <!-- MT with Multi-combine -->
+                        <g class="interactive-node" data-tooltip="Modern Trade (MT)">
+                            <rect x="1000" y="250" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
+                            <text x="1025" y="230" class="node-label" text-anchor="middle">MT</text>
+                        </g>
+                        <line class="interactive-line" data-tooltip="Direct Delivery" 
+                              x1="1140" y1="400" x2="1025" y2="300" 
+                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
+                        
+                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
+                            <circle cx="970" cy="180" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="970" y="160" class="node-label" text-anchor="middle">TT</text>
+                        </g>
+                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
+                              x1="1010" y1="255" x2="980" y2="200" 
+                              stroke="#FF8C00" stroke-width="3.5" marker-end="url(#arrowOrange)"/>
+                        <text x="990" y="230" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">MC</text>
+                        
+                        <!-- Saraburi Vendors (Raw material to plant) -->
                         <g class="interactive-node" data-tooltip="Raw Material Vendor → Saraburi Plant">
-                            <path d="M 1150,640 L 1170,610 L 1130,610 Z" fill="#FFC107" stroke="#FF8C00" stroke-width="2"/>
-                            <text x="1150" y="660" class="node-label" text-anchor="middle">Vendor</text>
+                            <path d="M 1160,720 L 1185,690 L 1135,690 Z" fill="#FFA500" stroke="#FFB300" stroke-width="2.5"/>
+                            <text x="1160" y="750" class="node-label" text-anchor="middle" font-size="10">Vendor</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Saraburi" x1="1150" y1="610" x2="1080" y2="120" stroke="#999" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arrowGray)"/>
+                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Saraburi" 
+                              x1="1160" y1="690" x2="1160" y2="485" 
+                              stroke="#999" stroke-width="3" stroke-dasharray="10,6" marker-end="url(#arrowGray)"/>
                         
                         <g class="interactive-node" data-tooltip="Raw Material Vendor → Saraburi Plant">
-                            <path d="M 1020,680 L 1040,650 L 1000,650 Z" fill="#FFC107" stroke="#FF8C00" stroke-width="2"/>
-                            <text x="1020" y="700" class="node-label" text-anchor="middle">Vendor</text>
+                            <path d="M 1300,750 L 1325,720 L 1275,720 Z" fill="#FFA500" stroke="#FFB300" stroke-width="2.5"/>
+                            <text x="1300" y="780" class="node-label" text-anchor="middle" font-size="10">Vendor</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Saraburi" x1="1020" y1="650" x2="1080" y2="120" stroke="#999" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arrowGray)"/>
+                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Saraburi" 
+                              x1="1300" y1="720" x2="1240" y2="485" 
+                              stroke="#999" stroke-width="3" stroke-dasharray="10,6" marker-end="url(#arrowGray)"/>
                         
-                        <!-- CENTER AREA - Additional MT and TT -->
+                        <!-- SHARED/CENTER AREA -->
                         
-                        <!-- Central MT -->
+                        <!-- Shared MT (receives from both plants) -->
                         <g class="interactive-node" data-tooltip="Modern Trade (MT) - Shared Delivery">
-                            <rect x="580" y="300" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
-                            <text x="600" y="290" class="node-label" text-anchor="middle">MT</text>
+                            <rect x="675" y="200" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
+                            <text x="700" y="180" class="node-label" text-anchor="middle">MT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Direct from Rayong" x1="190" y1="85" x2="580" y2="320" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
-                        <line class="interactive-line" data-tooltip="Direct from Saraburi" x1="1010" y1="85" x2="620" y2="320" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                        <line class="interactive-line" data-tooltip="Direct from Rayong" 
+                              x1="330" y1="420" x2="675" y2="225" 
+                              stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)" opacity="0.8"/>
+                        <line class="interactive-line" data-tooltip="Direct from Saraburi" 
+                              x1="1070" y1="420" x2="725" y2="225" 
+                              stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)" opacity="0.8"/>
                         
-                        <!-- Central TT cluster -->
+                        <!-- Shared TT cluster -->
                         <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="520" cy="450" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="520" y="490" class="node-label" text-anchor="middle">TT</text>
+                            <circle cx="600" cy="350" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="600" y="390" class="node-label" text-anchor="middle">TT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Direct from Rayong" x1="190" y1="100" x2="520" y2="450" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="600" cy="480" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="600" y="520" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" x1="538" y1="450" x2="582" y2="480" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="680" cy="450" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="680" y="490" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct from Saraburi" x1="1010" y1="100" x2="680" y2="450" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                        <line class="interactive-line" data-tooltip="Direct from Rayong" 
+                              x1="330" y1="430" x2="580" y2="360" 
+                              stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)" opacity="0.8"/>
                         
                         <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="600" cy="550" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
-                            <text x="600" y="590" class="node-label" text-anchor="middle">TT</text>
+                            <circle cx="800" cy="350" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="800" y="390" class="node-label" text-anchor="middle">TT</text>
                         </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" x1="600" y1="498" x2="600" y2="532" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                        <line class="interactive-line" data-tooltip="Direct from Saraburi" 
+                              x1="1070" y1="430" x2="820" y2="360" 
+                              stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)" opacity="0.8"/>
+                        
+                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
+                            <circle cx="700" cy="550" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
+                            <text x="700" y="590" class="node-label" text-anchor="middle">TT</text>
+                        </g>
+                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
+                              x1="700" y1="250" x2="700" y2="528" 
+                              stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)" opacity="0.8"/>
+                        <text x="685" y="400" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">MC</text>
                     </svg>
                 </div>
                 <div class="tooltip" id="tooltip"></div>
+            </div>
+            
+            <div class="info-note">
+                <strong>💡 Interactive Features:</strong> Click and drag to pan • Use buttons or Ctrl+Scroll to zoom • Hover over nodes and connections for details
             </div>
         </div>
     </div>
     
     <script>
-        // Zoom and Pan functionality
         let currentZoom = 1;
         let currentPan = { x: 0, y: 0 };
         let isDragging = false;
@@ -529,7 +689,7 @@
         
         function updateTransform() {
             svg.style.transform = `scale(${currentZoom}) translate(${currentPan.x}px, ${currentPan.y}px)`;
-            zoomLevelDisplay.textContent = `Zoom: ${Math.round(currentZoom * 100)}%`;
+            zoomLevelDisplay.textContent = `ZOOM: ${Math.round(currentZoom * 100)}%`;
         }
         
         function zoomIn() {
@@ -548,13 +708,15 @@
             updateTransform();
         }
         
-        // Mouse wheel zoom
+        // Mouse wheel zoom with Ctrl key only
         wrapper.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const delta = e.deltaY > 0 ? -0.1 : 0.1;
-            currentZoom = Math.max(0.5, Math.min(3, currentZoom + delta));
-            updateTransform();
-        });
+            if (e.ctrlKey) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                currentZoom = Math.max(0.5, Math.min(3, currentZoom + delta));
+                updateTransform();
+            }
+        }, { passive: false });
         
         // Pan functionality
         wrapper.addEventListener('mousedown', (e) => {
@@ -630,7 +792,7 @@
                 updateTransform();
                 touchStartDistance = touchDistance;
             }
-        });
+        }, { passive: false });
     </script>
 </body>
 </html>
