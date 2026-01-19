@@ -1,82 +1,366 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Interactive Supply Chain Network</title>
-  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-  <style type="text/css">
-    #mynetwork {
-      width: 100%;
-      height: 800px;
-      border: 1px solid lightgray;
-      background-color: #f9f9f9;
-    }
-    body { font-family: Arial, sans-serif; }
-    .legend {
-        margin-bottom: 10px; padding: 10px;
-        background: #eee; border-radius: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Chain Network - Rayong & Saraburi Distribution</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .legend-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .legend-section {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .legend-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #495057;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .node-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .node-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .node-triangle {
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 20px solid #FFC107;
+            margin-left: 2px;
+        }
+        
+        .line-sample {
+            width: 50px;
+            height: 3px;
+            flex-shrink: 0;
+        }
+        
+        .diagram-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border: 2px solid #e9ecef;
+        }
+        
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .hub-label {
+            font-weight: 700;
+            font-size: 18px;
+            fill: white;
+        }
+        
+        .node-label {
+            font-size: 11px;
+            fill: #666;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .legend-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<h2>Supply Chain Network: Rayong & Saraburi</h2>
-
-<div class="legend">
-    <strong>Legend:</strong>
-    <span style="color:#C00000">■ Main Hubs</span> | 
-    <span style="color:#0070C0">■ Modern Trade (MT)</span> | 
-    <span style="color:#00B050">● Traditional Trade (TT)</span> <br>
-    <strong>Lines:</strong> 
-    <span style="color:#C00000; font-weight:bold;">── Interplant</span> | 
-    <span style="color:black">── Direct</span> | 
-    <span style="color:#ED7D31">── Multi-Combine</span> | 
-    <span style="color:gray; border-bottom: 1px dashed gray;">-- Backhaul</span>
-</div>
-
-<div id="mynetwork"></div>
-
-<script type="text/javascript">
-  // 1. Define Nodes (The shapes)
-  var nodes = new vis.DataSet([
-    {id: '7101', label: 'Rayong Plant & DC\n(7101)', shape: 'box', color: '#C00000', font: {color: 'white', size: 20}, margin: 20},
-    {id: '7102', label: 'Saraburi Plant & DC\n(7102)', shape: 'box', color: '#C00000', font: {color: 'white', size: 20}, margin: 20},
-    {id: 'MT1', label: 'Modern Trade\n(MT)', shape: 'box', color: '#0070C0', font: {color: 'white'}},
-    {id: 'MT2', label: 'Modern Trade\n(MT)', shape: 'box', color: '#0070C0', font: {color: 'white'}},
-    {id: 'TT1', label: 'Traditional Trade\n(TT)', shape: 'dot', color: '#00B050', font: {color: 'white'}},
-    {id: 'TT2', label: 'Traditional Trade\n(TT)', shape: 'dot', color: '#00B050', font: {color: 'white'}},
-    {id: 'MT3', label: 'Modern Trade\n(MT)', shape: 'box', color: '#0070C0', font: {color: 'white'}},
-    {id: 'TT3', label: 'Traditional Trade\n(TT)', shape: 'dot', color: '#00B050', font: {color: 'white'}},
-    {id: 'TT4', label: 'Traditional Trade\n(TT)', shape: 'dot', color: '#00B050', font: {color: 'white'}}
-  ]);
-
-  // 2. Define Edges (The lines)
-  var edges = new vis.DataSet([
-    {from: '7101', to: '7102', color: {color:'#C00000'}, width: 4, arrows: 'to, from', label: 'Interplant Transfer'},
-    {from: '7101', to: 'MT1', color: {color:'black'}, arrows: 'to', label: 'Direct'},
-    {from: '7101', to: 'TT1', color: {color:'black'}, arrows: 'to'},
-    {from: '7101', to: 'MT2', color: {color:'#ED7D31'}, width: 2, arrows: 'to', label: 'Multi-Combine'},
-    {from: 'MT2', to: 'TT2', color: {color:'#ED7D31'}, width: 2, arrows: 'to'},
-    {from: '7102', to: 'MT3', color: {color:'black'}, arrows: 'to', label: 'Direct'},
-    {from: '7102', to: 'TT3', color: {color:'black'}, arrows: 'to'},
-    {from: 'TT4', to: '7102', color: {color:'gray'}, dashes: true, arrows: 'to', label: 'Raw Material Backhaul'}
-  ]);
-
-  // 3. Render the Network
-  var container = document.getElementById('mynetwork');
-  var data = { nodes: nodes, edges: edges };
-  var options = {
-    physics: {
-        enabled: true,
-        solver: 'forceAtlas2Based',
-        forceAtlas2Based: { gravitationalConstant: -100, springLength: 200, springConstant: 0.18 },
-        stabilization: {iterations: 150}
-    },
-    layout: {
-        hierarchical: { enabled: true, direction: 'UD', sortMethod: 'directed', levelSeparation: 150, nodeSpacing: 200 }
-    }
-  };
-  var network = new vis.Network(container, data, options);
-</script>
-
+    <div class="container">
+        <header>
+            <h1>Supply Chain Network</h1>
+            <p class="subtitle">Distribution System: Rayong Plant (7101) & Saraburi Plant (7102)</p>
+        </header>
+        
+        <div class="content">
+            <div class="legend-container">
+                <div class="legend-section">
+                    <div class="legend-title">Main Hubs</div>
+                    <div class="legend-item">
+                        <div class="node-box" style="background: #C00000;"></div>
+                        <span><strong>Rayong Plant & DC (7101)</strong></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="node-box" style="background: #C00000;"></div>
+                        <span><strong>Saraburi Plant & DC (7102)</strong></span>
+                    </div>
+                </div>
+                
+                <div class="legend-section">
+                    <div class="legend-title">Customer Types</div>
+                    <div class="legend-item">
+                        <div class="node-box" style="background: #0070C0;"></div>
+                        <span><strong>Modern Trade (MT)</strong></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="node-circle" style="background: #00B050;"></div>
+                        <span><strong>Traditional Trade (TT)</strong></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="node-triangle"></div>
+                        <span><strong>Vendor</strong></span>
+                    </div>
+                </div>
+                
+                <div class="legend-section">
+                    <div class="legend-title">Connection Types</div>
+                    <div class="legend-item">
+                        <div class="line-sample" style="background: #C00000; height: 5px;"></div>
+                        <span>Interplant Transfer</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="line-sample" style="background: #00B050; height: 4px;"></div>
+                        <span>Direct to Customer</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="line-sample" style="background: #FF8C00; height: 4px;"></div>
+                        <span>Multi-Combine</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="line-sample" style="background: repeating-linear-gradient(to right, #999 0, #999 8px, transparent 8px, transparent 14px);"></div>
+                        <span>Raw Material Backhaul</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="diagram-container">
+                <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#C00000" />
+                        </marker>
+                        <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#00B050" />
+                        </marker>
+                        <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#FF8C00" />
+                        </marker>
+                        <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#999" />
+                        </marker>
+                    </defs>
+                    
+                    <!-- Main Hub: Rayong Plant (7101) - Top Left -->
+                    <rect x="50" y="50" width="140" height="70" fill="#C00000" stroke="#8B0000" stroke-width="3" rx="5"/>
+                    <text x="120" y="80" class="hub-label" text-anchor="middle">Rayong Plant</text>
+                    <text x="120" y="100" class="hub-label" text-anchor="middle">(7101)</text>
+                    
+                    <!-- Main Hub: Saraburi Plant (7102) - Top Right -->
+                    <rect x="1010" y="50" width="140" height="70" fill="#C00000" stroke="#8B0000" stroke-width="3" rx="5"/>
+                    <text x="1080" y="80" class="hub-label" text-anchor="middle">Saraburi Plant</text>
+                    <text x="1080" y="100" class="hub-label" text-anchor="middle">(7102)</text>
+                    
+                    <!-- Interplant Transfer Line (Red, bidirectional) -->
+                    <line x1="190" y1="85" x2="1010" y2="85" stroke="#C00000" stroke-width="6" marker-end="url(#arrowRed)"/>
+                    <line x1="1010" y1="85" x2="190" y2="85" stroke="#C00000" stroke-width="6" marker-end="url(#arrowRed)" opacity="0.7"/>
+                    <text x="600" y="75" class="node-label" text-anchor="middle" fill="#C00000" font-size="13">Interplant Transfer</text>
+                    
+                    <!-- RAYONG (7101) CUSTOMERS -->
+                    
+                    <!-- Modern Trade 1 -->
+                    <rect x="80" y="250" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
+                    <text x="100" y="240" class="node-label" text-anchor="middle">MT</text>
+                    <line x1="120" y1="120" x2="100" y2="250" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    
+                    <!-- Modern Trade 2 with TT cluster -->
+                    <rect x="200" y="280" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
+                    <text x="220" y="270" class="node-label" text-anchor="middle">MT</text>
+                    <line x1="120" y1="120" x2="220" y2="280" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    
+                    <!-- TT connected to MT2 -->
+                    <circle cx="280" cy="380" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="280" y="420" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="240" y1="300" x2="280" y2="380" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                    <text x="260" y="340" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">Multi</text>
+                    
+                    <!-- TT cluster 1 -->
+                    <circle cx="100" cy="450" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="100" y="490" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="120" y1="120" x2="100" y2="450" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    
+                    <circle cx="170" cy="500" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="170" y="540" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="100" y1="468" x2="170" y2="500" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                    
+                    <circle cx="230" cy="520" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="230" y="560" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="170" y1="518" x2="230" y2="520" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                    
+                    <!-- Vendors for Rayong -->
+                    <path d="M 50,640 L 70,610 L 30,610 Z" fill="#FFC107" stroke="#FF8C00" stroke-width="2"/>
+                    <text x="50" y="660" class="node-label" text-anchor="middle">Vendor</text>
+                    <line x1="120" y1="120" x2="50" y2="610" stroke="#999" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arrowGray)"/>
+                    
+                    <path d="M 180,680 L 200,650 L 160,650 Z" fill="#FFC107" stroke="#FF8C00" stroke-width="2"/>
+                    <text x="180" y="700" class="node-label" text-anchor="middle">Vendor</text>
+                    <line x1="120" y1="120" x2="180" y2="650" stroke="#999" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arrowGray)"/>
+                    
+                    <!-- SARABURI (7102) CUSTOMERS -->
+                    
+                    <!-- Modern Trade 3 -->
+                    <rect x="1080" y="250" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
+                    <text x="1100" y="240" class="node-label" text-anchor="middle">MT</text>
+                    <line x1="1080" y1="120" x2="1100" y2="250" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    
+                    <!-- Modern Trade 4 with TT -->
+                    <rect x="960" y="280" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
+                    <text x="980" y="270" class="node-label" text-anchor="middle">MT</text>
+                    <line x1="1080" y1="120" x2="980" y2="280" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    
+                    <!-- TT connected to MT4 -->
+                    <circle cx="920" cy="380" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="920" y="420" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="960" y1="300" x2="920" y2="380" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                    <text x="940" y="340" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">Multi</text>
+                    
+                    <!-- TT cluster 2 -->
+                    <circle cx="1100" cy="450" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="1100" y="490" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="1080" y1="120" x2="1100" y2="450" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    
+                    <circle cx="1030" cy="500" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="1030" y="540" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="1100" y1="468" x2="1030" y2="500" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                    
+                    <circle cx="970" cy="520" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="970" y="560" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="1030" y1="518" x2="970" y2="520" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                    
+                    <!-- Vendors for Saraburi -->
+                    <path d="M 1150,640 L 1170,610 L 1130,610 Z" fill="#FFC107" stroke="#FF8C00" stroke-width="2"/>
+                    <text x="1150" y="660" class="node-label" text-anchor="middle">Vendor</text>
+                    <line x1="1080" y1="120" x2="1150" y2="610" stroke="#999" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arrowGray)"/>
+                    
+                    <path d="M 1020,680 L 1040,650 L 1000,650 Z" fill="#FFC107" stroke="#FF8C00" stroke-width="2"/>
+                    <text x="1020" y="700" class="node-label" text-anchor="middle">Vendor</text>
+                    <line x1="1080" y1="120" x2="1020" y2="650" stroke="#999" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arrowGray)"/>
+                    
+                    <!-- CENTER AREA - Additional MT and TT -->
+                    
+                    <!-- Central MT -->
+                    <rect x="580" y="300" width="40" height="40" fill="#0070C0" stroke="#005A9C" stroke-width="2" rx="3"/>
+                    <text x="600" y="290" class="node-label" text-anchor="middle">MT</text>
+                    <line x1="190" y1="85" x2="580" y2="320" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    <line x1="1010" y1="85" x2="620" y2="320" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    
+                    <!-- Central TT cluster -->
+                    <circle cx="520" cy="450" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="520" y="490" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="190" y1="100" x2="520" y2="450" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    
+                    <circle cx="600" cy="480" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="600" y="520" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="538" y1="450" x2="582" y2="480" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                    
+                    <circle cx="680" cy="450" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="680" y="490" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="1010" y1="100" x2="680" y2="450" stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                    
+                    <circle cx="600" cy="550" r="18" fill="#00B050" stroke="#008040" stroke-width="2"/>
+                    <text x="600" y="590" class="node-label" text-anchor="middle">TT</text>
+                    <line x1="600" y1="498" x2="600" y2="532" stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)"/>
+                </svg>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
