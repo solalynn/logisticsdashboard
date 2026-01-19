@@ -35,7 +35,7 @@
         }
         
         .container {
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
             background: var(--bg-white);
             border-radius: 24px;
@@ -258,7 +258,19 @@
             width: 100%;
             height: auto;
             display: block;
-            transition: transform 0.1s ease-out;
+        }
+        
+        .draggable {
+            cursor: move;
+            transition: filter 0.2s ease;
+        }
+        
+        .draggable:hover {
+            filter: brightness(1.2) drop-shadow(0 0 10px rgba(0, 57, 166, 0.5));
+        }
+        
+        .dragging {
+            filter: brightness(1.3) drop-shadow(0 0 15px rgba(0, 57, 166, 0.7));
         }
         
         .hub-label {
@@ -266,12 +278,14 @@
             font-size: 18px;
             fill: white;
             font-family: 'Poppins', sans-serif;
+            pointer-events: none;
         }
         
         .hub-code {
             font-size: 13px;
             fill: rgba(255, 255, 255, 0.9);
             font-weight: 500;
+            pointer-events: none;
         }
         
         .node-label {
@@ -279,24 +293,7 @@
             fill: var(--text-gray);
             font-weight: 600;
             font-family: 'Roboto', sans-serif;
-        }
-        
-        .interactive-node {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .interactive-node:hover {
-            filter: brightness(1.2) drop-shadow(0 0 10px rgba(0, 57, 166, 0.5));
-        }
-        
-        .interactive-line {
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        
-        .interactive-line:hover {
-            filter: drop-shadow(0 0 6px currentColor);
+            pointer-events: none;
         }
         
         .tooltip {
@@ -354,7 +351,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Supply Chain Network</h1>
+            <h1>🔄 Interactive Supply Chain Network</h1>
             <p class="subtitle">Distribution System: Rayong Plant (7101) ↔ Saraburi Plant (7102)</p>
         </header>
         
@@ -363,6 +360,7 @@
                 <button class="btn" onclick="zoomIn()"><span>🔍 Zoom In</span></button>
                 <button class="btn" onclick="zoomOut()"><span>🔍 Zoom Out</span></button>
                 <button class="btn" onclick="resetView()"><span>↺ Reset View</span></button>
+                <button class="btn" onclick="resetPositions()"><span>🔄 Reset Positions</span></button>
                 <div class="zoom-info">
                     <span id="zoomLevel">ZOOM: 100%</span>
                 </div>
@@ -382,7 +380,7 @@
                 </div>
                 
                 <div class="legend-section">
-                    <div class="legend-title">Customer Types</div>
+                    <div class="legend-title">Customer Types (Draggable)</div>
                     <div class="legend-item">
                         <div class="node-box" style="background: #0070C0;"></div>
                         <span><strong>Modern Trade (MT)</strong></span>
@@ -420,7 +418,7 @@
             
             <div class="diagram-container">
                 <div class="svg-wrapper" id="svgWrapper">
-                    <svg id="networkSvg" viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+                    <svg id="networkSvg" viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
                                 <path d="M0,0 L0,6 L9,3 z" fill="#0039A6" />
@@ -435,7 +433,6 @@
                                 <path d="M0,0 L0,6 L9,3 z" fill="#999" />
                             </marker>
                             
-                            <!-- Glow filters -->
                             <filter id="glow">
                                 <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
                                 <feMerge>
@@ -445,354 +442,343 @@
                             </filter>
                         </defs>
                         
-                        <!-- RAYONG PLANT (7101) - Left Side -->
-                        <g class="interactive-node" data-tooltip="Rayong Plant & DC (7101) - Main Hub">
-                            <rect x="150" y="400" width="180" height="85" fill="#0039A6" stroke="#0066CC" stroke-width="4" rx="10" filter="url(#glow)"/>
-                            <text x="240" y="430" class="hub-label" text-anchor="middle">Rayong Plant</text>
-                            <text x="240" y="455" class="hub-code" text-anchor="middle">(7101)</text>
-                        </g>
-                        
-                        <!-- SARABURI PLANT (7102) - Right Side -->
-                        <g class="interactive-node" data-tooltip="Saraburi Plant & DC (7102) - Main Hub">
-                            <rect x="1070" y="400" width="180" height="85" fill="#0039A6" stroke="#0066CC" stroke-width="4" rx="10" filter="url(#glow)"/>
-                            <text x="1160" y="430" class="hub-label" text-anchor="middle">Saraburi Plant</text>
-                            <text x="1160" y="455" class="hub-code" text-anchor="middle">(7102)</text>
-                        </g>
-                        
-                        <!-- INTERPLANT TRANSFER (Main Connection) -->
-                        <line class="interactive-line" data-tooltip="Interplant Transfer - Bidirectional" 
-                              x1="330" y1="442" x2="1070" y2="442" 
-                              stroke="#0039A6" stroke-width="8" marker-end="url(#arrowBlue)" opacity="0.9"/>
-                        <line class="interactive-line" 
-                              x1="1070" y1="442" x2="330" y2="442" 
-                              stroke="#0039A6" stroke-width="8" marker-end="url(#arrowBlue)" opacity="0.6"/>
-                        <text x="700" y="425" class="node-label" text-anchor="middle" fill="#0039A6" font-size="14" font-weight="700">Interplant Transfer</text>
-                        
-                        <!-- RAYONG SATELLITES (Left Side) -->
-                        
-                        <!-- MT Cluster - Top Left -->
-                        <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="50" y="150" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
-                            <text x="75" y="130" class="node-label" text-anchor="middle">MT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="200" y1="400" x2="75" y2="200" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="170" y="200" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
-                            <text x="195" y="180" class="node-label" text-anchor="middle">MT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="220" y1="400" x2="195" y2="250" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <!-- TT Cluster - Left Side -->
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="80" cy="320" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="80" y="360" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="180" y1="410" x2="102" y2="330" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="120" cy="560" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="120" y="600" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="185" y1="485" x2="142" y2="550" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="200" cy="650" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="200" y="690" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
-                              x1="140" y1="570" x2="190" y2="640" 
-                              stroke="#FF8C00" stroke-width="3.5" marker-end="url(#arrowOrange)"/>
-                        
-                        <!-- MT with Multi-combine -->
-                        <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="350" y="250" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
-                            <text x="375" y="230" class="node-label" text-anchor="middle">MT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="260" y1="400" x2="375" y2="300" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="430" cy="180" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="430" y="160" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
-                              x1="390" y1="255" x2="420" y2="200" 
-                              stroke="#FF8C00" stroke-width="3.5" marker-end="url(#arrowOrange)"/>
-                        <text x="410" y="230" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">MC</text>
-                        
-                        <!-- Rayong Vendors (Raw material to plant) -->
-                        <g class="interactive-node" data-tooltip="Raw Material Vendor → Rayong Plant">
-                            <path d="M 240,720 L 265,690 L 215,690 Z" fill="#FFA500" stroke="#FFB300" stroke-width="2.5"/>
-                            <text x="240" y="750" class="node-label" text-anchor="middle" font-size="10">Vendor</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Rayong" 
-                              x1="240" y1="690" x2="240" y2="485" 
-                              stroke="#999" stroke-width="3" stroke-dasharray="10,6" marker-end="url(#arrowGray)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Raw Material Vendor → Rayong Plant">
-                            <path d="M 100,750 L 125,720 L 75,720 Z" fill="#FFA500" stroke="#FFB300" stroke-width="2.5"/>
-                            <text x="100" y="780" class="node-label" text-anchor="middle" font-size="10">Vendor</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Rayong" 
-                              x1="100" y1="720" x2="160" y2="485" 
-                              stroke="#999" stroke-width="3" stroke-dasharray="10,6" marker-end="url(#arrowGray)"/>
-                        
-                        <!-- SARABURI SATELLITES (Right Side) -->
-                        
-                        <!-- MT Cluster - Top Right -->
-                        <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="1300" y="150" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
-                            <text x="1325" y="130" class="node-label" text-anchor="middle">MT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="1200" y1="400" x2="1325" y2="200" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="1180" y="200" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
-                            <text x="1205" y="180" class="node-label" text-anchor="middle">MT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="1180" y1="400" x2="1205" y2="250" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <!-- TT Cluster - Right Side -->
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="1320" cy="320" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="1320" y="360" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="1220" y1="410" x2="1298" y2="330" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="1280" cy="560" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="1280" y="600" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="1215" y1="485" x2="1258" y2="550" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="1200" cy="650" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="1200" y="690" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
-                              x1="1260" y1="570" x2="1210" y2="640" 
-                              stroke="#FF8C00" stroke-width="3.5" marker-end="url(#arrowOrange)"/>
-                        
-                        <!-- MT with Multi-combine -->
-                        <g class="interactive-node" data-tooltip="Modern Trade (MT)">
-                            <rect x="1000" y="250" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
-                            <text x="1025" y="230" class="node-label" text-anchor="middle">MT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct Delivery" 
-                              x1="1140" y1="400" x2="1025" y2="300" 
-                              stroke="#00B050" stroke-width="3.5" marker-end="url(#arrowGreen)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="970" cy="180" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="970" y="160" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
-                              x1="1010" y1="255" x2="980" y2="200" 
-                              stroke="#FF8C00" stroke-width="3.5" marker-end="url(#arrowOrange)"/>
-                        <text x="990" y="230" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">MC</text>
-                        
-                        <!-- Saraburi Vendors (Raw material to plant) -->
-                        <g class="interactive-node" data-tooltip="Raw Material Vendor → Saraburi Plant">
-                            <path d="M 1160,720 L 1185,690 L 1135,690 Z" fill="#FFA500" stroke="#FFB300" stroke-width="2.5"/>
-                            <text x="1160" y="750" class="node-label" text-anchor="middle" font-size="10">Vendor</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Saraburi" 
-                              x1="1160" y1="690" x2="1160" y2="485" 
-                              stroke="#999" stroke-width="3" stroke-dasharray="10,6" marker-end="url(#arrowGray)"/>
-                        
-                        <g class="interactive-node" data-tooltip="Raw Material Vendor → Saraburi Plant">
-                            <path d="M 1300,750 L 1325,720 L 1275,720 Z" fill="#FFA500" stroke="#FFB300" stroke-width="2.5"/>
-                            <text x="1300" y="780" class="node-label" text-anchor="middle" font-size="10">Vendor</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Raw Material Backhaul → Saraburi" 
-                              x1="1300" y1="720" x2="1240" y2="485" 
-                              stroke="#999" stroke-width="3" stroke-dasharray="10,6" marker-end="url(#arrowGray)"/>
-                        
-                        <!-- SHARED/CENTER AREA -->
-                        
-                        <!-- Shared MT (receives from both plants) -->
-                        <g class="interactive-node" data-tooltip="Modern Trade (MT) - Shared Delivery">
-                            <rect x="675" y="200" width="50" height="50" fill="#0070C0" stroke="#0099FF" stroke-width="2.5" rx="5"/>
-                            <text x="700" y="180" class="node-label" text-anchor="middle">MT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct from Rayong" 
-                              x1="330" y1="420" x2="675" y2="225" 
-                              stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)" opacity="0.8"/>
-                        <line class="interactive-line" data-tooltip="Direct from Saraburi" 
-                              x1="1070" y1="420" x2="725" y2="225" 
-                              stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)" opacity="0.8"/>
-                        
-                        <!-- Shared TT cluster -->
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="600" cy="350" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="600" y="390" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct from Rayong" 
-                              x1="330" y1="430" x2="580" y2="360" 
-                              stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)" opacity="0.8"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="800" cy="350" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="800" y="390" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Direct from Saraburi" 
-                              x1="1070" y1="430" x2="820" y2="360" 
-                              stroke="#00B050" stroke-width="3" marker-end="url(#arrowGreen)" opacity="0.8"/>
-                        
-                        <g class="interactive-node" data-tooltip="Traditional Trade (TT)">
-                            <circle cx="700" cy="550" r="22" fill="#00B050" stroke="#00DD66" stroke-width="2.5"/>
-                            <text x="700" y="590" class="node-label" text-anchor="middle">TT</text>
-                        </g>
-                        <line class="interactive-line" data-tooltip="Multi-Combine Delivery" 
-                              x1="700" y1="250" x2="700" y2="528" 
-                              stroke="#FF8C00" stroke-width="3" marker-end="url(#arrowOrange)" opacity="0.8"/>
-                        <text x="685" y="400" class="node-label" text-anchor="middle" fill="#FF8C00" font-size="10">MC</text>
+                        <g id="connections"></g>
+                        <g id="nodes"></g>
                     </svg>
                 </div>
                 <div class="tooltip" id="tooltip"></div>
             </div>
             
             <div class="info-note">
-                <strong>💡 Interactive Features:</strong> Click and drag to pan • Use buttons or Ctrl+Scroll to zoom • Hover over nodes and connections for details
+                <strong>💡 Interactive Features:</strong> Drag nodes to reposition • Click and drag background to pan • Buttons or Ctrl+Scroll to zoom • Hover for details
             </div>
         </div>
     </div>
     
     <script>
+        const nodeData = {
+            rayong: { x: 250, y: 350, width: 180, height: 85, type: 'plant', label: 'Rayong Plant', code: '(7101)', fixed: true },
+            saraburi: { x: 1170, y: 550, width: 180, height: 85, type: 'plant', label: 'Saraburi Plant', code: '(7102)', fixed: true },
+            
+            // Rayong satellites (asymmetric positioning)
+            mt1: { x: 120, y: 150, size: 50, type: 'mt', label: 'MT' },
+            mt2: { x: 380, y: 120, size: 50, type: 'mt', label: 'MT' },
+            tt1: { x: 80, y: 280, size: 22, type: 'tt', label: 'TT' },
+            tt2: { x: 150, y: 520, size: 22, type: 'tt', label: 'TT' },
+            tt3: { x: 280, y: 600, size: 22, type: 'tt', label: 'TT' },
+            mt3: { x: 450, y: 280, size: 50, type: 'mt', label: 'MT' },
+            tt4: { x: 550, y: 200, size: 22, type: 'tt', label: 'TT' },
+            vendor1: { x: 200, y: 50, size: 25, type: 'vendor', label: 'Vendor' },
+            vendor2: { x: 120, y: 700, size: 25, type: 'vendor', label: 'Vendor' },
+            
+            // Saraburi satellites (asymmetric positioning)
+            mt4: { x: 1450, y: 300, size: 50, type: 'mt', label: 'MT' },
+            mt5: { x: 1250, y: 200, size: 50, type: 'mt', label: 'MT' },
+            tt5: { x: 1480, y: 450, size: 22, type: 'tt', label: 'TT' },
+            tt6: { x: 1380, y: 700, size: 22, type: 'tt', label: 'TT' },
+            tt7: { x: 1250, y: 800, size: 22, type: 'tt', label: 'TT' },
+            mt6: { x: 1050, y: 350, size: 50, type: 'mt', label: 'MT' },
+            tt8: { x: 950, y: 280, size: 22, type: 'tt', label: 'TT' },
+            vendor3: { x: 1350, y: 100, size: 25, type: 'vendor', label: 'Vendor' },
+            vendor4: { x: 1450, y: 850, size: 25, type: 'vendor', label: 'Vendor' },
+            
+            // Shared area (center, asymmetric)
+            mt7: { x: 750, y: 250, size: 50, type: 'mt', label: 'MT' },
+            tt9: { x: 650, y: 450, size: 22, type: 'tt', label: 'TT' },
+            tt10: { x: 900, y: 550, size: 22, type: 'tt', label: 'TT' },
+            tt11: { x: 800, y: 700, size: 22, type: 'tt', label: 'TT' },
+        };
+        
+        const connections = [
+            // Interplant
+            { from: 'rayong', to: 'saraburi', color: '#0039A6', width: 8, type: 'Interplant Transfer', marker: 'arrowBlue', bidirectional: true },
+            
+            // Rayong connections
+            { from: 'rayong', to: 'mt1', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'rayong', to: 'mt2', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'rayong', to: 'tt1', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'rayong', to: 'tt2', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'tt2', to: 'tt3', color: '#FF8C00', width: 3.5, type: 'Multi-Combine', marker: 'arrowOrange' },
+            { from: 'rayong', to: 'mt3', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'mt3', to: 'tt4', color: '#FF8C00', width: 3.5, type: 'Multi-Combine', marker: 'arrowOrange' },
+            { from: 'vendor1', to: 'rayong', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            { from: 'vendor2', to: 'rayong', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            
+            // Saraburi connections
+            { from: 'saraburi', to: 'mt4', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'saraburi', to: 'mt5', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'saraburi', to: 'tt5', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'saraburi', to: 'tt6', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'tt6', to: 'tt7', color: '#FF8C00', width: 3.5, type: 'Multi-Combine', marker: 'arrowOrange' },
+            { from: 'saraburi', to: 'mt6', color: '#00B050', width: 3.5, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'mt6', to: 'tt8', color: '#FF8C00', width: 3.5, type: 'Multi-Combine', marker: 'arrowOrange' },
+            { from: 'vendor3', to: 'saraburi', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            { from: 'vendor4', to: 'saraburi', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            
+            // Shared connections
+            { from: 'rayong', to: 'mt7', color: '#00B050', width: 3, type: 'Direct from Rayong', marker: 'arrowGreen', opacity: 0.7 },
+            { from: 'saraburi', to: 'mt7', color: '#00B050', width: 3, type: 'Direct from Saraburi', marker: 'arrowGreen', opacity: 0.7 },
+            { from: 'rayong', to: 'tt9', color: '#00B050', width: 3, type: 'Direct from Rayong', marker: 'arrowGreen', opacity: 0.7 },
+            { from: 'saraburi', to: 'tt10', color: '#00B050', width: 3, type: 'Direct from Saraburi', marker: 'arrowGreen', opacity: 0.7 },
+            { from: 'mt7', to: 'tt11', color: '#FF8C00', width: 3, type: 'Multi-Combine', marker: 'arrowOrange', opacity: 0.7 },
+        ];
+        
         let currentZoom = 1;
-        let currentPan = { x: 0, y: 0 };
-        let isDragging = false;
-        let startPan = { x: 0, y: 0 };
+        let draggedNode = null;
+        let dragOffset = { x: 0, y: 0 };
         
         const svg = document.getElementById('networkSvg');
-        const wrapper = document.getElementById('svgWrapper');
+        const nodesGroup = document.getElementById('nodes');
+        const connectionsGroup = document.getElementById('connections');
         const tooltip = document.getElementById('tooltip');
         const zoomLevelDisplay = document.getElementById('zoomLevel');
         
-        function updateTransform() {
-            svg.style.transform = `scale(${currentZoom}) translate(${currentPan.x}px, ${currentPan.y}px)`;
-            zoomLevelDisplay.textContent = `ZOOM: ${Math.round(currentZoom * 100)}%`;
+        function getNodeCenter(nodeId) {
+            const node = nodeData[nodeId];
+            if (node.type === 'plant') {
+                return { x: node.x + node.width / 2, y: node.y + node.height / 2 };
+            } else {
+                return { x: node.x, y: node.y };
+            }
         }
         
+        function drawConnections() {
+            connectionsGroup.innerHTML = '';
+            connections.forEach(conn => {
+                const from = getNodeCenter(conn.from);
+                const to = getNodeCenter(conn.to);
+                
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', from.x);
+                line.setAttribute('y1', from.y);
+                line.setAttribute('x2', to.x);
+                line.setAttribute('y2', to.y);
+                line.setAttribute('stroke', conn.color);
+                line.setAttribute('stroke-width', conn.width);
+                line.setAttribute('marker-end', `url(#${conn.marker})`);
+                line.setAttribute('opacity', conn.opacity || 0.9);
+                if (conn.dashed) {
+                    line.setAttribute('stroke-dasharray', '10,6');
+                }
+                line.setAttribute('data-tooltip', conn.type);
+                line.classList.add('connection-line');
+                
+                connectionsGroup.appendChild(line);
+                
+                if (conn.bidirectional) {
+                    const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line2.setAttribute('x1', to.x);
+                    line2.setAttribute('y1', to.y);
+                    line2.setAttribute('x2', from.x);
+                    line2.setAttribute('y2', from.y);
+                    line2.setAttribute('stroke', conn.color);
+                    line2.setAttribute('stroke-width', conn.width);
+                    line2.setAttribute('marker-end', `url(#${conn.marker})`);
+                    line2.setAttribute('opacity', 0.6);
+                    connectionsGroup.appendChild(line2);
+                }
+            });
+        }
+        
+        function drawNodes() {
+            nodesGroup.innerHTML = '';
+            
+            Object.entries(nodeData).forEach(([id, node]) => {
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('data-id', id);
+                g.setAttribute('data-tooltip', node.label);
+                if (!node.fixed) {
+                    g.classList.add('draggable');
+                }
+                
+                if (node.type === 'plant') {
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', node.x);
+                    rect.setAttribute('y', node.y);
+                    rect.setAttribute('width', node.width);
+                    rect.setAttribute('height', node.height);
+                    rect.setAttribute('fill', '#0039A6');
+                    rect.setAttribute('stroke', '#0066CC');
+                    rect.setAttribute('stroke-width', '4');
+                    rect.setAttribute('rx', '10');
+                    rect.setAttribute('filter', 'url(#glow)');
+                    g.appendChild(rect);
+                    
+                    const text1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text1.setAttribute('x', node.x + node.width / 2);
+                    text1.setAttribute('y', node.y + 30);
+                    text1.setAttribute('class', 'hub-label');
+                    text1.setAttribute('text-anchor', 'middle');
+                    text1.textContent = node.label;
+                    g.appendChild(text1);
+                    
+                    const text2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text2.setAttribute('x', node.x + node.width / 2);
+                    text2.setAttribute('y', node.y + 55);
+                    text2.setAttribute('class', 'hub-code');
+                    text2.setAttribute('text-anchor', 'middle');
+                    text2.textContent = node.code;
+                    g.appendChild(text2);
+                } else if (node.type === 'mt') {
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', node.x - node.size / 2);
+                    rect.setAttribute('y', node.y - node.size / 2);
+                    rect.setAttribute('width', node.size);
+                    rect.setAttribute('height', node.size);
+                    rect.setAttribute('fill', '#0070C0');
+                    rect.setAttribute('stroke', '#0099FF');
+                    rect.setAttribute('stroke-width', '2.5');
+                    rect.setAttribute('rx', '5');
+                    g.appendChild(rect);
+                    
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', node.x);
+                    text.setAttribute('y', node.y - node.size / 2 - 8);
+                    text.setAttribute('class', 'node-label');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.textContent = node.label;
+                    g.appendChild(text);
+                } else if (node.type === 'tt') {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', node.x);
+                    circle.setAttribute('cy', node.y);
+                    circle.setAttribute('r', node.size);
+                    circle.setAttribute('fill', '#00B050');
+                    circle.setAttribute('stroke', '#00DD66');
+                    circle.setAttribute('stroke-width', '2.5');
+                    g.appendChild(circle);
+                    
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', node.x);
+                    text.setAttribute('y', node.y + node.size + 18);
+                    text.setAttribute('class', 'node-label');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.textContent = node.label;
+                    g.appendChild(text);
+                } else if (node.type === 'vendor') {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const d = `M ${node.x},${node.y} L ${node.x + 20},${node.y - 30} L ${node.x - 20},${node.y - 30} Z`;
+                    path.setAttribute('d', d);
+                    path.setAttribute('fill', '#FFA500');
+                    path.setAttribute('stroke', '#FFB300');
+                    path.setAttribute('stroke-width', '2.5');
+                    g.appendChild(path);
+                    
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', node.x);
+                    text.setAttribute('y', node.y + 15);
+                    text.setAttribute('class', 'node-label');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('font-size', '10');
+                    text.textContent = node.label;
+                    g.appendChild(text);
+                }
+                
+                nodesGroup.appendChild(g);
+            });
+        }
+        
+        function redraw() {
+            drawConnections();
+            drawNodes();
+        }
+        
+        // Dragging functionality
+        svg.addEventListener('mousedown', (e) => {
+            const g = e.target.closest('.draggable');
+            if (g) {
+                draggedNode = g.getAttribute('data-id');
+                const pt = svg.createSVGPoint();
+                pt.x = e.clientX;
+                pt.y = e.clientY;
+                const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+                dragOffset = {
+                    x: svgP.x - nodeData[draggedNode].x,
+                    y: svgP.y - nodeData[draggedNode].y
+                };
+                g.classList.add('dragging');
+                e.preventDefault();
+            }
+        });
+        
+        svg.addEventListener('mousemove', (e) => {
+            if (draggedNode) {
+                const pt = svg.createSVGPoint();
+                pt.x = e.clientX;
+                pt.y = e.clientY;
+                const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+                nodeData[draggedNode].x = svgP.x - dragOffset.x;
+                nodeData[draggedNode].y = svgP.y - dragOffset.y;
+                redraw();
+            }
+        });
+        
+        svg.addEventListener('mouseup', () => {
+            if (draggedNode) {
+                const g = nodesGroup.querySelector(`[data-id="${draggedNode}"]`);
+                if (g) g.classList.remove('dragging');
+                draggedNode = null;
+            }
+        });
+        
+        // Tooltip
+        svg.addEventListener('mouseover', (e) => {
+            const target = e.target.closest('[data-tooltip]');
+            if (target) {
+                tooltip.textContent = target.getAttribute('data-tooltip');
+                tooltip.classList.add('show');
+            }
+        });
+        
+        svg.addEventListener('mousemove', (e) => {
+            if (tooltip.classList.contains('show')) {
+                tooltip.style.left = e.pageX + 15 + 'px';
+                tooltip.style.top = e.pageY + 15 + 'px';
+            }
+        });
+        
+        svg.addEventListener('mouseout', (e) => {
+            if (!e.target.closest('[data-tooltip]')) {
+                tooltip.classList.remove('show');
+            }
+        });
+        
+        // Zoom functions
         function zoomIn() {
             currentZoom = Math.min(currentZoom + 0.2, 3);
-            updateTransform();
+            svg.style.transform = `scale(${currentZoom})`;
+            zoomLevelDisplay.textContent = `ZOOM: ${Math.round(currentZoom * 100)}%`;
         }
         
         function zoomOut() {
             currentZoom = Math.max(currentZoom - 0.2, 0.5);
-            updateTransform();
+            svg.style.transform = `scale(${currentZoom})`;
+            zoomLevelDisplay.textContent = `ZOOM: ${Math.round(currentZoom * 100)}%`;
         }
         
         function resetView() {
             currentZoom = 1;
-            currentPan = { x: 0, y: 0 };
-            updateTransform();
+            svg.style.transform = `scale(${currentZoom})`;
+            zoomLevelDisplay.textContent = `ZOOM: ${Math.round(currentZoom * 100)}%`;
         }
         
-        // Mouse wheel zoom with Ctrl key only
-        wrapper.addEventListener('wheel', (e) => {
+        function resetPositions() {
+            location.reload();
+        }
+        
+        // Mouse wheel zoom with Ctrl
+        document.getElementById('svgWrapper').addEventListener('wheel', (e) => {
             if (e.ctrlKey) {
                 e.preventDefault();
                 const delta = e.deltaY > 0 ? -0.1 : 0.1;
                 currentZoom = Math.max(0.5, Math.min(3, currentZoom + delta));
-                updateTransform();
+                svg.style.transform = `scale(${currentZoom})`;
+                zoomLevelDisplay.textContent = `ZOOM: ${Math.round(currentZoom * 100)}%`;
             }
         }, { passive: false });
         
-        // Pan functionality
-        wrapper.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.interactive-node') || e.target.closest('.interactive-line')) return;
-            isDragging = true;
-            startPan = {
-                x: e.clientX - currentPan.x,
-                y: e.clientY - currentPan.y
-            };
-        });
-        
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            currentPan = {
-                x: e.clientX - startPan.x,
-                y: e.clientY - startPan.y
-            };
-            updateTransform();
-        });
-        
-        window.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-        
-        // Tooltip functionality
-        const interactiveElements = document.querySelectorAll('.interactive-node, .interactive-line');
-        
-        interactiveElements.forEach(element => {
-            element.addEventListener('mouseenter', (e) => {
-                const tooltipText = element.getAttribute('data-tooltip');
-                if (tooltipText) {
-                    tooltip.textContent = tooltipText;
-                    tooltip.classList.add('show');
-                }
-            });
-            
-            element.addEventListener('mousemove', (e) => {
-                tooltip.style.left = e.pageX + 15 + 'px';
-                tooltip.style.top = e.pageY + 15 + 'px';
-            });
-            
-            element.addEventListener('mouseleave', () => {
-                tooltip.classList.remove('show');
-            });
-        });
-        
-        // Touch support for mobile
-        let touchStartDistance = 0;
-        
-        wrapper.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-                const touch1 = e.touches[0];
-                const touch2 = e.touches[1];
-                touchStartDistance = Math.hypot(
-                    touch2.clientX - touch1.clientX,
-                    touch2.clientY - touch1.clientY
-                );
-            }
-        });
-        
-        wrapper.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                const touch1 = e.touches[0];
-                const touch2 = e.touches[1];
-                const touchDistance = Math.hypot(
-                    touch2.clientX - touch1.clientX,
-                    touch2.clientY - touch1.clientY
-                );
-                
-                const delta = (touchDistance - touchStartDistance) * 0.01;
-                currentZoom = Math.max(0.5, Math.min(3, currentZoom + delta));
-                updateTransform();
-                touchStartDistance = touchDistance;
-            }
-        }, { passive: false });
+        // Initial draw
+        redraw();
     </script>
 </body>
 </html>
