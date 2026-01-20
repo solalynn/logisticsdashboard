@@ -21,35 +21,43 @@
         }
         
         .document-container {
-            max-width: 750px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
         }
         
-        .legend-container {
+        .main-layout {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr 280px;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .diagram-side {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .legend-side {
+            display: flex;
+            flex-direction: column;
             gap: 1.2rem;
-            margin-bottom: 1.5rem;
-            padding: 1.5rem;
+        }
+        
+        .legend-section {
             background: #F5F7FA;
+            padding: 1.2rem;
             border-radius: 8px;
             border: 1px solid #E3E8EF;
         }
         
-        .legend-section {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-        
         .legend-title {
             font-weight: 700;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: #0066CC;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.8rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid #0066CC;
         }
@@ -58,20 +66,25 @@
             display: flex;
             align-items: center;
             gap: 0.7rem;
-            font-size: 0.85rem;
-            line-height: 1.4;
+            margin-bottom: 0.7rem;
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
         }
         
         .node-box {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 3px;
             flex-shrink: 0;
         }
         
         .node-circle {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             flex-shrink: 0;
         }
@@ -79,15 +92,15 @@
         .node-triangle {
             width: 0;
             height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-bottom: 16px solid #FF8C00;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 15px solid #FF8C00;
             margin-left: 2px;
             flex-shrink: 0;
         }
         
         .line-sample {
-            width: 40px;
+            width: 36px;
             height: 3px;
             flex-shrink: 0;
         }
@@ -186,155 +199,165 @@
                 display: none;
             }
         }
+        
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="document-container">
-        <div class="legend-container">
-            <div class="legend-section">
-                <div class="legend-title">Main Distribution Centers</div>
-                <div class="legend-item">
-                    <div class="node-box" style="background: #0066CC;"></div>
-                    <span>Rayong Plant & DC (7101)</span>
+        <div class="main-layout">
+            <div class="diagram-side">
+                <div class="controls">
+                    <button class="btn" onclick="resetPositions()">🔄 Reset Layout</button>
+                    <div class="info-text">
+                        💡 Drag nodes to customize layout
+                    </div>
                 </div>
-                <div class="legend-item">
-                    <div class="node-box" style="background: #0066CC;"></div>
-                    <span>Saraburi Plant & DC (7102)</span>
-                </div>
-            </div>
-            
-            <div class="legend-section">
-                <div class="legend-title">Customer Types (Draggable)</div>
-                <div class="legend-item">
-                    <div class="node-box" style="background: #0080E0;"></div>
-                    <span>Modern Trade (MT)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="node-circle" style="background: #00B050;"></div>
-                    <span>Traditional Trade (TT)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="node-triangle"></div>
-                    <span>Raw Material Vendor</span>
-                </div>
-            </div>
-            
-            <div class="legend-section">
-                <div class="legend-title">Connection Types</div>
-                <div class="legend-item">
-                    <div class="line-sample" style="background: #0066CC; height: 4px;"></div>
-                    <span>Interplant Transfer</span>
-                </div>
-                <div class="legend-item">
-                    <div class="line-sample" style="background: #00B050; height: 3px;"></div>
-                    <span>Direct to Customer</span>
-                </div>
-                <div class="legend-item">
-                    <div class="line-sample" style="background: #FF9933; height: 3px;"></div>
-                    <span>Multi-Combine Delivery</span>
-                </div>
-                <div class="legend-item">
-                    <div class="line-sample" style="background: repeating-linear-gradient(to right, #999 0, #999 6px, transparent 6px, transparent 10px);"></div>
-                    <span>Raw Material Backhaul</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="controls">
-            <button class="btn" onclick="resetPositions()">🔄 Reset Layout</button>
-            <div class="info-text">
-                💡 Drag nodes to customize layout
-            </div>
-        </div>
-        
-        <div class="diagram-container">
-            <svg id="networkSvg" viewBox="0 0 700 950" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#0066CC" />
-                    </marker>
-                    <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#00B050" />
-                    </marker>
-                    <marker id="arrowOrange" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#FF9933" />
-                    </marker>
-                    <marker id="arrowGray" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#999" />
-                    </marker>
-                </defs>
                 
-                <g id="connections"></g>
-                <g id="nodes"></g>
-            </svg>
+                <div class="diagram-container">
+                    <svg id="networkSvg" viewBox="0 0 600 950" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#0066CC" />
+                            </marker>
+                            <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#00B050" />
+                            </marker>
+                            <marker id="arrowOrange" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#FF9933" />
+                            </marker>
+                            <marker id="arrowGray" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#999" />
+                            </marker>
+                        </defs>
+                        
+                        <g id="connections"></g>
+                        <g id="nodes"></g>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="legend-side">
+                <div class="legend-section">
+                    <div class="legend-title">Main Distribution Centers</div>
+                    <div class="legend-item">
+                        <div class="node-box" style="background: #0066CC;"></div>
+                        <span>Saraburi Plant & DC (7102)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="node-box" style="background: #0066CC;"></div>
+                        <span>Rayong Plant & DC (7101)</span>
+                    </div>
+                </div>
+                
+                <div class="legend-section">
+                    <div class="legend-title">Customer Types (Draggable)</div>
+                    <div class="legend-item">
+                        <div class="node-box" style="background: #0080E0;"></div>
+                        <span>Modern Trade (MT)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="node-circle" style="background: #00B050;"></div>
+                        <span>Traditional Trade (TT)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="node-triangle"></div>
+                        <span>Raw Material Vendor</span>
+                    </div>
+                </div>
+                
+                <div class="legend-section">
+                    <div class="legend-title">Connection Types</div>
+                    <div class="legend-item">
+                        <div class="line-sample" style="background: #0066CC; height: 4px;"></div>
+                        <span>Interplant Transfer</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="line-sample" style="background: #00B050; height: 3px;"></div>
+                        <span>Direct to Customer</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="line-sample" style="background: #FF9933; height: 3px;"></div>
+                        <span>Multi-Combine Delivery</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="line-sample" style="background: repeating-linear-gradient(to right, #999 0, #999 6px, transparent 6px, transparent 10px);"></div>
+                        <span>Raw Material Backhaul</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
     <script>
         const nodeData = {
-            // Rayong Plant - Top
-            rayong: { x: 240, y: 180, width: 140, height: 70, type: 'plant', label: 'Rayong Plant', code: '(7101)', fixed: true },
+            // Saraburi Plant - Top (swapped)
+            saraburi: { x: 230, y: 180, width: 140, height: 70, type: 'plant', label: 'Saraburi Plant', code: '(7102)', fixed: true },
             
-            // Saraburi Plant - Bottom  
-            saraburi: { x: 280, y: 680, width: 140, height: 70, type: 'plant', label: 'Saraburi Plant', code: '(7102)', fixed: true },
+            // Rayong Plant - Bottom (swapped)
+            rayong: { x: 230, y: 680, width: 140, height: 70, type: 'plant', label: 'Rayong Plant', code: '(7101)', fixed: true },
             
-            // Rayong cluster (top area)
-            mt1: { x: 120, y: 80, size: 35, type: 'mt', label: 'MT' },
-            mt2: { x: 350, y: 60, size: 35, type: 'mt', label: 'MT' },
-            mt3: { x: 480, y: 140, size: 35, type: 'mt', label: 'MT' },
-            tt1: { x: 80, y: 200, size: 18, type: 'tt', label: 'TT' },
-            tt2: { x: 140, y: 310, size: 18, type: 'tt', label: 'TT' },
-            tt3: { x: 220, y: 380, size: 18, type: 'tt', label: 'TT' },
-            tt4: { x: 560, y: 220, size: 18, type: 'tt', label: 'TT' },
-            vendor1: { x: 180, y: 20, size: 22, type: 'vendor', label: 'Vendor' },
-            vendor2: { x: 450, y: 20, size: 22, type: 'vendor', label: 'Vendor' },
+            // Saraburi cluster (top area - was Rayong)
+            mt1: { x: 110, y: 80, size: 35, type: 'mt', label: 'MT' },
+            mt2: { x: 340, y: 60, size: 35, type: 'mt', label: 'MT' },
+            mt3: { x: 470, y: 140, size: 35, type: 'mt', label: 'MT' },
+            tt1: { x: 70, y: 200, size: 18, type: 'tt', label: 'TT' },
+            tt2: { x: 130, y: 310, size: 18, type: 'tt', label: 'TT' },
+            tt3: { x: 210, y: 380, size: 18, type: 'tt', label: 'TT' },
+            tt4: { x: 550, y: 220, size: 18, type: 'tt', label: 'TT' },
+            vendor1: { x: 170, y: 20, size: 22, type: 'vendor', label: 'Vendor' },
+            vendor2: { x: 440, y: 20, size: 22, type: 'vendor', label: 'Vendor' },
             
             // Center area
-            mt_center: { x: 350, y: 430, size: 35, type: 'mt', label: 'MT' },
-            tt_center1: { x: 480, y: 480, size: 18, type: 'tt', label: 'TT' },
-            tt_center2: { x: 200, y: 510, size: 18, type: 'tt', label: 'TT' },
+            mt_center: { x: 340, y: 430, size: 35, type: 'mt', label: 'MT' },
+            tt_center1: { x: 470, y: 480, size: 18, type: 'tt', label: 'TT' },
+            tt_center2: { x: 190, y: 510, size: 18, type: 'tt', label: 'TT' },
             
-            // Saraburi cluster (bottom area)
-            mt4: { x: 520, y: 620, size: 35, type: 'mt', label: 'MT' },
-            mt5: { x: 160, y: 640, size: 35, type: 'mt', label: 'MT' },
-            mt6: { x: 600, y: 740, size: 35, type: 'mt', label: 'MT' },
-            tt5: { x: 80, y: 760, size: 18, type: 'tt', label: 'TT' },
-            tt6: { x: 420, y: 820, size: 18, type: 'tt', label: 'TT' },
-            tt7: { x: 500, y: 880, size: 18, type: 'tt', label: 'TT' },
-            vendor3: { x: 200, y: 920, size: 22, type: 'vendor', label: 'Vendor' },
-            vendor4: { x: 520, y: 920, size: 22, type: 'vendor', label: 'Vendor' },
+            // Rayong cluster (bottom area - was Saraburi)
+            mt4: { x: 510, y: 620, size: 35, type: 'mt', label: 'MT' },
+            mt5: { x: 150, y: 640, size: 35, type: 'mt', label: 'MT' },
+            mt6: { x: 550, y: 740, size: 35, type: 'mt', label: 'MT' },
+            tt5: { x: 70, y: 760, size: 18, type: 'tt', label: 'TT' },
+            tt6: { x: 410, y: 820, size: 18, type: 'tt', label: 'TT' },
+            tt7: { x: 490, y: 880, size: 18, type: 'tt', label: 'TT' },
+            vendor3: { x: 190, y: 920, size: 22, type: 'vendor', label: 'Vendor' },
+            vendor4: { x: 510, y: 920, size: 22, type: 'vendor', label: 'Vendor' },
         };
         
         const connections = [
-            // Main interplant transfer - thick blue vertical line
-            { from: 'rayong', to: 'saraburi', color: '#0066CC', width: 7, type: 'Interplant Transfer', marker: 'arrowBlue', bidirectional: true },
+            // Main interplant transfer - thick blue vertical line (reversed direction)
+            { from: 'saraburi', to: 'rayong', color: '#0066CC', width: 7, type: 'Interplant Transfer', marker: 'arrowBlue', bidirectional: true },
             
-            // Rayong connections
-            { from: 'rayong', to: 'mt1', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'rayong', to: 'mt2', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'rayong', to: 'mt3', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'rayong', to: 'tt1', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'rayong', to: 'tt2', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
+            // Saraburi connections (top - was Rayong)
+            { from: 'saraburi', to: 'mt1', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'saraburi', to: 'mt2', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'saraburi', to: 'mt3', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'saraburi', to: 'tt1', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'saraburi', to: 'tt2', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
             { from: 'tt2', to: 'tt3', color: '#FF9933', width: 3, type: 'Multi-Combine', marker: 'arrowOrange' },
             { from: 'mt3', to: 'tt4', color: '#FF9933', width: 3, type: 'Multi-Combine', marker: 'arrowOrange' },
-            { from: 'vendor1', to: 'rayong', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
-            { from: 'vendor2', to: 'rayong', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            { from: 'vendor1', to: 'saraburi', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            { from: 'vendor2', to: 'saraburi', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
             
             // Center/shared connections
-            { from: 'rayong', to: 'mt_center', color: '#00B050', width: 2.5, type: 'Direct from Rayong', marker: 'arrowGreen', opacity: 0.75 },
             { from: 'saraburi', to: 'mt_center', color: '#00B050', width: 2.5, type: 'Direct from Saraburi', marker: 'arrowGreen', opacity: 0.75 },
+            { from: 'rayong', to: 'mt_center', color: '#00B050', width: 2.5, type: 'Direct from Rayong', marker: 'arrowGreen', opacity: 0.75 },
             { from: 'mt_center', to: 'tt_center1', color: '#FF9933', width: 2.5, type: 'Multi-Combine', marker: 'arrowOrange', opacity: 0.75 },
-            { from: 'rayong', to: 'tt_center2', color: '#00B050', width: 2.5, type: 'Direct from Rayong', marker: 'arrowGreen', opacity: 0.75 },
+            { from: 'saraburi', to: 'tt_center2', color: '#00B050', width: 2.5, type: 'Direct from Saraburi', marker: 'arrowGreen', opacity: 0.75 },
             
-            // Saraburi connections
-            { from: 'saraburi', to: 'mt4', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'saraburi', to: 'mt5', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'saraburi', to: 'mt6', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'saraburi', to: 'tt5', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'saraburi', to: 'tt6', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowOrange' },
+            // Rayong connections (bottom - was Saraburi)
+            { from: 'rayong', to: 'mt4', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'rayong', to: 'mt5', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'rayong', to: 'mt6', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'rayong', to: 'tt5', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
+            { from: 'rayong', to: 'tt6', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowOrange' },
             { from: 'tt6', to: 'tt7', color: '#FF9933', width: 3, type: 'Multi-Combine', marker: 'arrowOrange' },
-            { from: 'vendor3', to: 'saraburi', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
-            { from: 'vendor4', to: 'saraburi', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            { from: 'vendor3', to: 'rayong', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            { from: 'vendor4', to: 'rayong', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
         ];
         
         let draggedNode = null;
