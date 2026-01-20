@@ -233,6 +233,9 @@
                             <marker id="arrowGray" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
                                 <path d="M0,0 L0,6 L9,3 z" fill="#999" />
                             </marker>
+                            <marker id="arrowPurple" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#9966CC" />
+                            </marker>
                         </defs>
                         
                         <g id="connections"></g>
@@ -288,6 +291,10 @@
                         <div class="line-sample" style="background: repeating-linear-gradient(to right, #999 0, #999 6px, transparent 6px, transparent 10px);"></div>
                         <span>Raw Material Backhaul</span>
                     </div>
+                    <div class="legend-item">
+                        <div class="line-sample" style="background: repeating-linear-gradient(to right, #9966CC 0, #9966CC 6px, transparent 6px, transparent 10px);"></div>
+                        <span>Backhaul Leg (Customer→Vendor→Plant)</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -295,13 +302,13 @@
     
     <script>
         const nodeData = {
-            // Saraburi Plant - Top (swapped)
+            // Saraburi Plant - Top
             saraburi: { x: 230, y: 180, width: 140, height: 70, type: 'plant', label: 'Saraburi Plant', code: '(7102)', fixed: true },
             
-            // Rayong Plant - Bottom (swapped)
+            // Rayong Plant - Bottom
             rayong: { x: 230, y: 680, width: 140, height: 70, type: 'plant', label: 'Rayong Plant', code: '(7101)', fixed: true },
             
-            // Saraburi cluster (top area - was Rayong)
+            // Saraburi cluster (top area)
             mt1: { x: 110, y: 80, size: 35, type: 'mt', label: 'MT' },
             mt2: { x: 340, y: 60, size: 35, type: 'mt', label: 'MT' },
             mt3: { x: 470, y: 140, size: 35, type: 'mt', label: 'MT' },
@@ -317,7 +324,7 @@
             tt_center1: { x: 470, y: 480, size: 18, type: 'tt', label: 'TT' },
             tt_center2: { x: 190, y: 510, size: 18, type: 'tt', label: 'TT' },
             
-            // Rayong cluster (bottom area - was Saraburi)
+            // Rayong cluster (bottom area)
             mt4: { x: 510, y: 620, size: 35, type: 'mt', label: 'MT' },
             mt5: { x: 150, y: 640, size: 35, type: 'mt', label: 'MT' },
             mt6: { x: 550, y: 740, size: 35, type: 'mt', label: 'MT' },
@@ -329,10 +336,10 @@
         };
         
         const connections = [
-            // Main interplant transfer - thick blue vertical line (reversed direction)
+            // Main interplant transfer
             { from: 'saraburi', to: 'rayong', color: '#0066CC', width: 7, type: 'Interplant Transfer', marker: 'arrowBlue', bidirectional: true },
             
-            // Saraburi connections (top - was Rayong)
+            // Saraburi connections
             { from: 'saraburi', to: 'mt1', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
             { from: 'saraburi', to: 'mt2', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
             { from: 'saraburi', to: 'mt3', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
@@ -340,8 +347,13 @@
             { from: 'saraburi', to: 'tt2', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
             { from: 'tt2', to: 'tt3', color: '#FF9933', width: 3, type: 'Multi-Combine', marker: 'arrowOrange' },
             { from: 'mt3', to: 'tt4', color: '#FF9933', width: 3, type: 'Multi-Combine', marker: 'arrowOrange' },
-            { from: 'vendor1', to: 'saraburi', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            
+            // Saraburi - Direct vendor backhaul
             { from: 'vendor2', to: 'saraburi', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            
+            // Saraburi - Backhaul leg flow: MT1 → Vendor1 → Saraburi
+            { from: 'mt1', to: 'vendor1', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
+            { from: 'vendor1', to: 'saraburi', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
             
             // Center/shared connections
             { from: 'saraburi', to: 'mt_center', color: '#00B050', width: 2.5, type: 'Direct from Saraburi', marker: 'arrowGreen', opacity: 0.75 },
@@ -349,15 +361,23 @@
             { from: 'mt_center', to: 'tt_center1', color: '#FF9933', width: 2.5, type: 'Multi-Combine', marker: 'arrowOrange', opacity: 0.75 },
             { from: 'saraburi', to: 'tt_center2', color: '#00B050', width: 2.5, type: 'Direct from Saraburi', marker: 'arrowGreen', opacity: 0.75 },
             
-            // Rayong connections (bottom - was Saraburi)
+            // Rayong connections
             { from: 'rayong', to: 'mt4', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
             { from: 'rayong', to: 'mt5', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
             { from: 'rayong', to: 'mt6', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
             { from: 'rayong', to: 'tt5', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
             { from: 'rayong', to: 'tt6', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowOrange' },
             { from: 'tt6', to: 'tt7', color: '#FF9933', width: 3, type: 'Multi-Combine', marker: 'arrowOrange' },
-            { from: 'vendor3', to: 'rayong', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            
+            // Rayong - Direct vendor backhaul
             { from: 'vendor4', to: 'rayong', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
+            
+            // Rayong - Backhaul leg flow: TT5 → Vendor3 → Rayong
+            { from: 'tt5', to: 'vendor3', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
+            { from: 'vendor3', to: 'rayong', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
+            
+            // Additional backhaul leg: MT6 → Vendor4 → Rayong
+            { from: 'mt6', to: 'vendor4', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
         ];
         
         let draggedNode = null;
