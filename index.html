@@ -1,582 +1,315 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPBT Transport Network Structure</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
+
+const SimpleDashboard = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState('total');
+
+  const data = [
+    { route: 'BANGBUATHONG', util6W: 87, util10W: 83, util18W: 98, utilTotal: 97 },
+    { route: 'SAMKOKE', util6W: 79, util10W: 74, util18W: 96, utilTotal: 94 },
+    { route: 'KHONKAEN', util6W: 96, util10W: 79, util18W: 99, utilTotal: 98 },
+    { route: 'SURATTHANI', util6W: 100, util10W: 74, util18W: 98, utilTotal: 97 },
+    { route: 'LAMPHUN', util6W: 95, util10W: 80, util18W: 96, utilTotal: 93 },
+    { route: 'WANGNOI', util6W: 73, util10W: 69, util18W: 81, utilTotal: 75 }
+  ];
+
+  const periodLabels = {
+    'total': 'Overall Average',
+    '6W': '6 Week Period',
+    '10W': '10 Week Period',
+    '18W': '18 Week Period'
+  };
+
+  const getDisplayData = () => {
+    return data.map(d => ({
+      route: d.route,
+      value: selectedPeriod === 'total' ? d.utilTotal : 
+             selectedPeriod === '6W' ? d.util6W :
+             selectedPeriod === '10W' ? d.util10W : d.util18W
+    })).sort((a, b) => b.value - a.value);
+  };
+
+  // Pastel color palette inspired by Lotus branding
+  const getColor = (value) => {
+    if (value >= 95) return '#7dd3c0'; // Pastel teal/mint
+    if (value >= 85) return '#f4b47a'; // Pastel orange/peach (was purple)
+    if (value >= 75) return '#e89090'; // Pastel dark red/rose
+    return '#f89a9a'; // Pastel red/coral
+  };
+
+  const getStatusText = (value) => {
+    if (value >= 95) return 'Excellent';
+    if (value >= 85) return 'Good';
+    if (value >= 75) return 'Fair';
+    return 'Needs Attention';
+  };
+
+  const chartData = getDisplayData();
+
+  return (
+    <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-8">
+      <div className="max-w-6xl mx-auto">
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            background: white;
-            padding: 1.5rem;
-            color: #333;
-        }
-        
-        .document-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-        }
-        
-        .main-layout {
-            display: grid;
-            grid-template-columns: 1fr 280px;
-            gap: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .diagram-side {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .legend-side {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-        
-        .legend-section {
-            background: #F5F7FA;
-            padding: 1.2rem;
-            border-radius: 8px;
-            border: 1px solid #E3E8EF;
-        }
-        
-        .legend-title {
-            font-weight: 700;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #0066CC;
-            margin-bottom: 0.8rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #0066CC;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            margin-bottom: 0.7rem;
-            font-size: 0.8rem;
-            line-height: 1.3;
-        }
-        
-        .legend-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .node-box {
-            width: 18px;
-            height: 18px;
-            border-radius: 3px;
-            flex-shrink: 0;
-        }
-        
-        .node-circle {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        
-        .node-triangle {
-            width: 0;
-            height: 0;
-            border-left: 9px solid transparent;
-            border-right: 9px solid transparent;
-            border-bottom: 15px solid #FF8C00;
-            margin-left: 2px;
-            flex-shrink: 0;
-        }
-        
-        .line-sample {
-            width: 36px;
-            height: 3px;
-            flex-shrink: 0;
-        }
-        
-        .controls {
-            display: flex;
-            gap: 0.8rem;
-            margin-bottom: 1.2rem;
-            flex-wrap: wrap;
-            padding: 0.9rem 1.2rem;
-            background: #F5F7FA;
-            border-radius: 8px;
-        }
-        
-        .btn {
-            padding: 0.6rem 1.2rem;
-            background: #0066CC;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-family: 'Roboto', sans-serif;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .btn:hover {
-            background: #0052A3;
-        }
-        
-        .info-text {
-            padding: 0.6rem 1.2rem;
-            background: white;
-            border: 1px solid #E3E8EF;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            color: #666;
-            font-weight: 500;
-        }
-        
-        .diagram-container {
-            background: #FAFBFC;
-            border-radius: 8px;
-            padding: 2.5rem 2rem;
-            border: 1px solid #E3E8EF;
-        }
-        
-        svg {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        
-        .draggable {
-            cursor: move;
-            transition: filter 0.2s ease;
-        }
-        
-        .draggable:hover {
-            filter: brightness(1.15) drop-shadow(0 0 6px rgba(0, 102, 204, 0.4));
-        }
-        
-        .dragging {
-            filter: brightness(1.25) drop-shadow(0 0 8px rgba(0, 102, 204, 0.6));
-        }
-        
-        .hub-label {
-            font-weight: 700;
-            font-size: 18px;
-            fill: white;
-            font-family: 'Roboto', sans-serif;
-            pointer-events: none;
-        }
-        
-        .hub-code {
-            font-size: 14px;
-            fill: rgba(255, 255, 255, 0.95);
-            font-weight: 500;
-            pointer-events: none;
-        }
-        
-        .node-label {
-            font-size: 11px;
-            fill: #555;
-            font-weight: 700;
-            font-family: 'Roboto', sans-serif;
-            pointer-events: none;
-        }
-        
-        @media print {
-            body {
-                padding: 0;
-            }
-            .controls {
-                display: none;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="document-container">
-        <div class="main-layout">
-            <div class="diagram-side">
-                <div class="controls">
-                    <button class="btn" onclick="resetPositions()">🔄 Reset Layout</button>
-                    <div class="info-text">
-                        💡 Drag nodes to customize layout
-                    </div>
-                </div>
-                
-                <div class="diagram-container">
-                    <svg id="networkSvg" viewBox="0 0 600 950" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                                <path d="M0,0 L0,6 L9,3 z" fill="#0066CC" />
-                            </marker>
-                            <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                                <path d="M0,0 L0,6 L9,3 z" fill="#00B050" />
-                            </marker>
-                            <marker id="arrowOrange" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                                <path d="M0,0 L0,6 L9,3 z" fill="#FF9933" />
-                            </marker>
-                            <marker id="arrowGray" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                                <path d="M0,0 L0,6 L9,3 z" fill="#999" />
-                            </marker>
-                            <marker id="arrowPurple" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
-                                <path d="M0,0 L0,6 L9,3 z" fill="#9966CC" />
-                            </marker>
-                        </defs>
-                        
-                        <g id="connections"></g>
-                        <g id="nodes"></g>
-                    </svg>
-                </div>
-            </div>
-            
-            <div class="legend-side">
-                <div class="legend-section">
-                    <div class="legend-title">Main Distribution Centers</div>
-                    <div class="legend-item">
-                        <div class="node-box" style="background: #0066CC;"></div>
-                        <span>Saraburi Plant & DC (7102)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="node-box" style="background: #0066CC;"></div>
-                        <span>Rayong Plant & DC (7101)</span>
-                    </div>
-                </div>
-                
-                <div class="legend-section">
-                    <div class="legend-title">Customer Types (Draggable)</div>
-                    <div class="legend-item">
-                        <div class="node-box" style="background: #0080E0;"></div>
-                        <span>Modern Trade (MT)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="node-circle" style="background: #00B050;"></div>
-                        <span>Traditional Trade (TT)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="node-triangle"></div>
-                        <span>Raw Material Vendor</span>
-                    </div>
-                </div>
-                
-                <div class="legend-section">
-                    <div class="legend-title">Connection Types</div>
-                    <div class="legend-item">
-                        <div class="line-sample" style="background: #0066CC; height: 4px;"></div>
-                        <span>Interplant Transfer</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="line-sample" style="background: #00B050; height: 3px;"></div>
-                        <span>Direct to Customer</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="line-sample" style="background: #FF9933; height: 3px;"></div>
-                        <span>Multi-Combine Delivery</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="line-sample" style="background: repeating-linear-gradient(to right, #999 0, #999 6px, transparent 6px, transparent 10px);"></div>
-                        <span>Raw Material Backhaul</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="line-sample" style="background: repeating-linear-gradient(to right, #9966CC 0, #9966CC 6px, transparent 6px, transparent 10px);"></div>
-                        <span>Backhaul Leg (Customer→Vendor→Plant)</span>
-                    </div>
-                </div>
-            </div>
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Truck Utilization Report</h1>
+          <p className="text-gray-600">Simple view of performance by route</p>
         </div>
+
+        {/* Period Selector */}
+        <div className="bg-white/80 backdrop-blur rounded-xl shadow-lg p-6 mb-6 border border-purple-100">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Select Time Period</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { key: 'total', color: 'from-purple-200 to-purple-300' },
+              { key: '6W', color: 'from-blue-200 to-blue-300' },
+              { key: '10W', color: 'from-pink-200 to-pink-300' },
+              { key: '18W', color: 'from-teal-200 to-teal-300' }
+            ].map(({ key, color }) => (
+              <button
+                key={key}
+                onClick={() => setSelectedPeriod(key)}
+                className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                  selectedPeriod === key
+                    ? `bg-gradient-to-r ${color} text-gray-800 shadow-lg transform scale-105`
+                    : 'bg-white/60 text-gray-600 hover:bg-white/80 border border-gray-200'
+                }`}
+              >
+                {periodLabels[key]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Chart */}
+        <div className="bg-white/80 backdrop-blur rounded-xl shadow-lg p-6 mb-6 border border-purple-100">
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+            Utilization % - {periodLabels[selectedPeriod]}
+          </h2>
+          
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart 
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#d8b4fe" opacity={0.3} />
+              <XAxis 
+                dataKey="route" 
+                angle={-45}
+                textAnchor="end"
+                height={80}
+                tick={{ fontSize: 12, fill: '#4b5563' }}
+              />
+              <YAxis 
+                domain={[0, 100]}
+                tick={{ fontSize: 12, fill: '#4b5563' }}
+                label={{ value: 'Utilization %', angle: -90, position: 'insideLeft', fill: '#4b5563' }}
+              />
+              <Tooltip 
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-white/95 backdrop-blur p-4 border-2 border-purple-200 rounded-lg shadow-xl">
+                        <p className="font-semibold text-gray-800">{payload[0].payload.route}</p>
+                        <p className="text-2xl font-bold mt-1" style={{ color: getColor(payload[0].value) }}>
+                          {payload[0].value}%
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">{getStatusText(payload[0].value)}</p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Bar dataKey="value" radius={[12, 12, 0, 0]}>
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getColor(entry.value)} opacity={0.9} />
+                ))}
+                <LabelList 
+                  dataKey="value" 
+                  position="top" 
+                  formatter={(value) => `${value}%`}
+                  style={{ fill: '#374151', fontWeight: 'bold', fontSize: '14px' }}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+
+          {/* Target Line Reference */}
+          <div className="mt-4 flex justify-center">
+            <div className="text-sm text-gray-600 bg-purple-50 px-5 py-2 rounded-full border border-purple-200">
+              Target: <span className="font-semibold">85%</span> minimum utilization
+            </div>
+          </div>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          
+          {/* Best Performers */}
+          <div className="bg-white/80 backdrop-blur rounded-xl shadow-lg p-6 border border-teal-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <span className="text-2xl mr-2">✓</span>
+              Top Performers
+            </h3>
+            <div className="space-y-3">
+              {chartData.slice(0, 3).map((route, idx) => (
+                <div key={idx} className="flex items-center justify-between p-4 bg-gradient-to-r from-teal-50 to-teal-100 rounded-xl border border-teal-200">
+                  <div>
+                    <p className="font-semibold text-gray-800">{route.route}</p>
+                    <p className="text-xs text-gray-600">{getStatusText(route.value)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold" style={{ color: '#059669' }}>{route.value}%</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Needs Attention */}
+          <div className="bg-white/80 backdrop-blur rounded-xl shadow-lg p-6 border border-pink-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <span className="text-2xl mr-2">⚠</span>
+              Needs Attention
+            </h3>
+            <div className="space-y-3">
+              {chartData.slice(-3).reverse().map((route, idx) => (
+                <div key={idx} className="flex items-center justify-between p-4 bg-gradient-to-r from-pink-50 to-pink-100 rounded-xl border border-pink-200">
+                  <div>
+                    <p className="font-semibold text-gray-800">{route.route}</p>
+                    <p className="text-xs text-gray-600">{getStatusText(route.value)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold" style={{ color: '#dc2626' }}>{route.value}%</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Simple Table View */}
+        <div className="bg-white/80 backdrop-blur rounded-xl shadow-lg p-6 border border-purple-100">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Complete Data Table</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b-2 border-purple-200">
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Route</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-blue-50/50 rounded-t-lg">6 Weeks</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-purple-50/50 rounded-t-lg">10 Weeks</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-pink-50/50 rounded-t-lg">18 Weeks</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-blue-100 rounded-t-lg">Overall</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((route, idx) => (
+                  <tr key={idx} className="border-b border-purple-100 hover:bg-purple-50/30">
+                    <td className="py-3 px-4 font-medium text-gray-800">{route.route}</td>
+                    <td className="py-3 px-4 text-center bg-blue-50/30">
+                      <span 
+                        className="inline-block px-4 py-2 rounded-lg font-semibold shadow-sm"
+                        style={{ 
+                          backgroundColor: getColor(route.util6W),
+                          color: '#1f2937'
+                        }}
+                      >
+                        {route.util6W}%
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center bg-purple-50/30">
+                      <span 
+                        className="inline-block px-4 py-2 rounded-lg font-semibold shadow-sm"
+                        style={{ 
+                          backgroundColor: getColor(route.util10W),
+                          color: '#1f2937'
+                        }}
+                      >
+                        {route.util10W}%
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center bg-pink-50/30">
+                      <span 
+                        className="inline-block px-4 py-2 rounded-lg font-semibold shadow-sm"
+                        style={{ 
+                          backgroundColor: getColor(route.util18W),
+                          color: '#1f2937'
+                        }}
+                      >
+                        {route.util18W}%
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center bg-gradient-to-r from-purple-100/50 to-blue-100/50">
+                      <span 
+                        className="inline-block px-4 py-2 rounded-lg font-bold text-lg shadow-md"
+                        style={{ 
+                          backgroundColor: getColor(route.utilTotal),
+                          color: '#1f2937'
+                        }}
+                      >
+                        {route.utilTotal}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Color Legend */}
+        <div className="mt-6 bg-white/80 backdrop-blur rounded-xl shadow-lg p-6 border border-purple-100">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Performance Levels</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-xl shadow-md" style={{ backgroundColor: '#7dd3c0' }}></div>
+              <div>
+                <p className="font-semibold text-gray-800">Excellent</p>
+                <p className="text-sm text-gray-600">95% or higher</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-xl shadow-md" style={{ backgroundColor: '#f4b47a' }}></div>
+              <div>
+                <p className="font-semibold text-gray-800">Good</p>
+                <p className="text-sm text-gray-600">85% - 94%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-xl shadow-md" style={{ backgroundColor: '#e89090' }}></div>
+              <div>
+                <p className="font-semibold text-gray-800">Fair</p>
+                <p className="text-sm text-gray-600">75% - 84%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-xl shadow-md" style={{ backgroundColor: '#f89a9a' }}></div>
+              <div>
+                <p className="font-semibold text-gray-800">Critical</p>
+                <p className="text-sm text-gray-600">Below 75%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Insight Box */}
+        <div className="mt-6 bg-gradient-to-r from-blue-100 to-purple-100 border-l-4 border-purple-400 rounded-xl p-6 shadow-lg">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+            <span className="mr-2">💡</span>
+            Key Insight
+          </h3>
+          <p className="text-gray-700">
+            {selectedPeriod === 'total' && "Overall fleet performance is strong at 96% average. WANGNOI is the only route below target at 75%."}
+            {selectedPeriod === '6W' && "6-week period shows 85% fleet average. SURATTHANI achieves perfect 100% utilization."}
+            {selectedPeriod === '10W' && "10-week period is the weakest at 78% fleet average. All routes should investigate this dip."}
+            {selectedPeriod === '18W' && "18-week period excels at 97% fleet average. KHONKAEN leads with 99% utilization."}
+          </p>
+        </div>
+
+      </div>
     </div>
-    
-    <script>
-        const nodeData = {
-            // Saraburi Plant - Top
-            saraburi: { x: 230, y: 180, width: 140, height: 70, type: 'plant', label: 'Saraburi Plant', code: '(7102)', fixed: true },
-            
-            // Rayong Plant - Bottom
-            rayong: { x: 230, y: 680, width: 140, height: 70, type: 'plant', label: 'Rayong Plant', code: '(7101)', fixed: true },
-            
-            // Saraburi cluster (top area)
-            mt1: { x: 110, y: 80, size: 35, type: 'mt', label: 'MT' },
-            mt2: { x: 340, y: 60, size: 35, type: 'mt', label: 'MT' },
-            mt3: { x: 470, y: 140, size: 35, type: 'mt', label: 'MT' },
-            tt1: { x: 70, y: 200, size: 18, type: 'tt', label: 'TT' },
-            tt2: { x: 130, y: 310, size: 18, type: 'tt', label: 'TT' },
-            tt3: { x: 210, y: 380, size: 18, type: 'tt', label: 'TT' },
-            tt4: { x: 550, y: 220, size: 18, type: 'tt', label: 'TT' },
-            vendor1: { x: 170, y: 20, size: 22, type: 'vendor', label: 'Vendor' },
-            vendor2: { x: 440, y: 20, size: 22, type: 'vendor', label: 'Vendor' },
-            
-            // Center area
-            mt_center: { x: 340, y: 430, size: 35, type: 'mt', label: 'MT' },
-            tt_center1: { x: 470, y: 480, size: 18, type: 'tt', label: 'TT' },
-            tt_center2: { x: 190, y: 510, size: 18, type: 'tt', label: 'TT' },
-            
-            // Rayong cluster (bottom area)
-            mt4: { x: 510, y: 620, size: 35, type: 'mt', label: 'MT' },
-            mt5: { x: 150, y: 640, size: 35, type: 'mt', label: 'MT' },
-            mt6: { x: 550, y: 740, size: 35, type: 'mt', label: 'MT' },
-            tt5: { x: 70, y: 760, size: 18, type: 'tt', label: 'TT' },
-            tt6: { x: 410, y: 820, size: 18, type: 'tt', label: 'TT' },
-            tt7: { x: 490, y: 880, size: 18, type: 'tt', label: 'TT' },
-            vendor3: { x: 190, y: 920, size: 22, type: 'vendor', label: 'Vendor' },
-            vendor4: { x: 510, y: 920, size: 22, type: 'vendor', label: 'Vendor' },
-        };
-        
-        const connections = [
-            // Main interplant transfer
-            { from: 'saraburi', to: 'rayong', color: '#0066CC', width: 7, type: 'Interplant Transfer', marker: 'arrowBlue', bidirectional: true },
-            
-            // Saraburi connections
-            { from: 'saraburi', to: 'mt1', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'saraburi', to: 'mt2', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'saraburi', to: 'mt3', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'saraburi', to: 'tt1', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'saraburi', to: 'tt2', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'tt2', to: 'tt3', color: '#FF9933', width: 3, type: 'Multi-Combine', marker: 'arrowOrange' },
-            { from: 'mt3', to: 'tt4', color: '#FF9933', width: 3, type: 'Multi-Combine', marker: 'arrowOrange' },
-            
-            // Saraburi - Direct vendor backhaul
-            { from: 'vendor2', to: 'saraburi', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
-            
-            // Saraburi - Backhaul leg flow: MT1 → Vendor1 → Saraburi
-            { from: 'mt1', to: 'vendor1', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
-            { from: 'vendor1', to: 'saraburi', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
-            
-            // Center/shared connections
-            { from: 'saraburi', to: 'mt_center', color: '#00B050', width: 2.5, type: 'Direct from Saraburi', marker: 'arrowGreen', opacity: 0.75 },
-            { from: 'rayong', to: 'mt_center', color: '#00B050', width: 2.5, type: 'Direct from Rayong', marker: 'arrowGreen', opacity: 0.75 },
-            { from: 'mt_center', to: 'tt_center1', color: '#FF9933', width: 2.5, type: 'Multi-Combine', marker: 'arrowOrange', opacity: 0.75 },
-            { from: 'saraburi', to: 'tt_center2', color: '#00B050', width: 2.5, type: 'Direct from Saraburi', marker: 'arrowGreen', opacity: 0.75 },
-            
-            // Rayong connections
-            { from: 'rayong', to: 'mt4', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'rayong', to: 'mt5', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'rayong', to: 'mt6', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'rayong', to: 'tt5', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowGreen' },
-            { from: 'rayong', to: 'tt6', color: '#00B050', width: 3, type: 'Direct Delivery', marker: 'arrowOrange' },
-            { from: 'tt6', to: 'tt7', color: '#FF9933', width: 3, type: 'Multi-Combine', marker: 'arrowOrange' },
-            
-            // Rayong - Direct vendor backhaul
-            { from: 'vendor4', to: 'rayong', color: '#999', width: 3, type: 'Raw Material Backhaul', marker: 'arrowGray', dashed: true },
-            
-            // Rayong - Backhaul leg flow: TT5 → Vendor3 → Rayong
-            { from: 'tt5', to: 'vendor3', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
-            { from: 'vendor3', to: 'rayong', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
-            
-            // Additional backhaul leg: MT6 → Vendor4 → Rayong
-            { from: 'mt6', to: 'vendor4', color: '#9966CC', width: 2.5, type: 'Backhaul Leg', marker: 'arrowPurple', dashed: true },
-        ];
-        
-        let draggedNode = null;
-        let dragOffset = { x: 0, y: 0 };
-        
-        const svg = document.getElementById('networkSvg');
-        const nodesGroup = document.getElementById('nodes');
-        const connectionsGroup = document.getElementById('connections');
-        
-        function getNodeCenter(nodeId) {
-            const node = nodeData[nodeId];
-            if (node.type === 'plant') {
-                return { x: node.x + node.width / 2, y: node.y + node.height / 2 };
-            } else {
-                return { x: node.x, y: node.y };
-            }
-        }
-        
-        function drawConnections() {
-            connectionsGroup.innerHTML = '';
-            connections.forEach(conn => {
-                const from = getNodeCenter(conn.from);
-                const to = getNodeCenter(conn.to);
-                
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', from.x);
-                line.setAttribute('y1', from.y);
-                line.setAttribute('x2', to.x);
-                line.setAttribute('y2', to.y);
-                line.setAttribute('stroke', conn.color);
-                line.setAttribute('stroke-width', conn.width);
-                line.setAttribute('marker-end', `url(#${conn.marker})`);
-                line.setAttribute('opacity', conn.opacity || 0.9);
-                if (conn.dashed) {
-                    line.setAttribute('stroke-dasharray', '8,5');
-                }
-                
-                connectionsGroup.appendChild(line);
-                
-                if (conn.bidirectional) {
-                    const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line2.setAttribute('x1', to.x);
-                    line2.setAttribute('y1', to.y);
-                    line2.setAttribute('x2', from.x);
-                    line2.setAttribute('y2', from.y);
-                    line2.setAttribute('stroke', conn.color);
-                    line2.setAttribute('stroke-width', conn.width);
-                    line2.setAttribute('marker-end', `url(#${conn.marker})`);
-                    line2.setAttribute('opacity', 0.5);
-                    connectionsGroup.appendChild(line2);
-                }
-            });
-        }
-        
-        function drawNodes() {
-            nodesGroup.innerHTML = '';
-            
-            Object.entries(nodeData).forEach(([id, node]) => {
-                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                g.setAttribute('data-id', id);
-                if (!node.fixed) {
-                    g.classList.add('draggable');
-                }
-                
-                if (node.type === 'plant') {
-                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    rect.setAttribute('x', node.x);
-                    rect.setAttribute('y', node.y);
-                    rect.setAttribute('width', node.width);
-                    rect.setAttribute('height', node.height);
-                    rect.setAttribute('fill', '#0066CC');
-                    rect.setAttribute('stroke', '#0080E0');
-                    rect.setAttribute('stroke-width', '3');
-                    rect.setAttribute('rx', '6');
-                    g.appendChild(rect);
-                    
-                    const text1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text1.setAttribute('x', node.x + node.width / 2);
-                    text1.setAttribute('y', node.y + 28);
-                    text1.setAttribute('class', 'hub-label');
-                    text1.setAttribute('text-anchor', 'middle');
-                    text1.textContent = node.label;
-                    g.appendChild(text1);
-                    
-                    const text2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text2.setAttribute('x', node.x + node.width / 2);
-                    text2.setAttribute('y', node.y + 50);
-                    text2.setAttribute('class', 'hub-code');
-                    text2.setAttribute('text-anchor', 'middle');
-                    text2.textContent = node.code;
-                    g.appendChild(text2);
-                } else if (node.type === 'mt') {
-                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    rect.setAttribute('x', node.x - node.size / 2);
-                    rect.setAttribute('y', node.y - node.size / 2);
-                    rect.setAttribute('width', node.size);
-                    rect.setAttribute('height', node.size);
-                    rect.setAttribute('fill', '#0080E0');
-                    rect.setAttribute('stroke', '#40A0FF');
-                    rect.setAttribute('stroke-width', '2');
-                    rect.setAttribute('rx', '3');
-                    g.appendChild(rect);
-                    
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text.setAttribute('x', node.x);
-                    text.setAttribute('y', node.y - node.size / 2 - 5);
-                    text.setAttribute('class', 'node-label');
-                    text.setAttribute('text-anchor', 'middle');
-                    text.textContent = node.label;
-                    g.appendChild(text);
-                } else if (node.type === 'tt') {
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    circle.setAttribute('cx', node.x);
-                    circle.setAttribute('cy', node.y);
-                    circle.setAttribute('r', node.size);
-                    circle.setAttribute('fill', '#00B050');
-                    circle.setAttribute('stroke', '#00DD66');
-                    circle.setAttribute('stroke-width', '2');
-                    g.appendChild(circle);
-                    
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text.setAttribute('x', node.x);
-                    text.setAttribute('y', node.y + node.size + 14);
-                    text.setAttribute('class', 'node-label');
-                    text.setAttribute('text-anchor', 'middle');
-                    text.textContent = node.label;
-                    g.appendChild(text);
-                } else if (node.type === 'vendor') {
-                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    const d = `M ${node.x},${node.y} L ${node.x + 14},${node.y - 22} L ${node.x - 14},${node.y - 22} Z`;
-                    path.setAttribute('d', d);
-                    path.setAttribute('fill', '#FF9933');
-                    path.setAttribute('stroke', '#FFB366');
-                    path.setAttribute('stroke-width', '2');
-                    g.appendChild(path);
-                    
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text.setAttribute('x', node.x);
-                    text.setAttribute('y', node.y + 13);
-                    text.setAttribute('class', 'node-label');
-                    text.setAttribute('text-anchor', 'middle');
-                    text.setAttribute('font-size', '10');
-                    text.textContent = node.label;
-                    g.appendChild(text);
-                }
-                
-                nodesGroup.appendChild(g);
-            });
-        }
-        
-        function redraw() {
-            drawConnections();
-            drawNodes();
-        }
-        
-        // Dragging
-        svg.addEventListener('mousedown', (e) => {
-            const g = e.target.closest('.draggable');
-            if (g) {
-                draggedNode = g.getAttribute('data-id');
-                const pt = svg.createSVGPoint();
-                pt.x = e.clientX;
-                pt.y = e.clientY;
-                const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
-                dragOffset = {
-                    x: svgP.x - nodeData[draggedNode].x,
-                    y: svgP.y - nodeData[draggedNode].y
-                };
-                g.classList.add('dragging');
-                e.preventDefault();
-            }
-        });
-        
-        svg.addEventListener('mousemove', (e) => {
-            if (draggedNode) {
-                const pt = svg.createSVGPoint();
-                pt.x = e.clientX;
-                pt.y = e.clientY;
-                const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
-                nodeData[draggedNode].x = svgP.x - dragOffset.x;
-                nodeData[draggedNode].y = svgP.y - dragOffset.y;
-                redraw();
-            }
-        });
-        
-        svg.addEventListener('mouseup', () => {
-            if (draggedNode) {
-                const g = nodesGroup.querySelector(`[data-id="${draggedNode}"]`);
-                if (g) g.classList.remove('dragging');
-                draggedNode = null;
-            }
-        });
-        
-        function resetPositions() {
-            location.reload();
-        }
-        
-        // Initial draw
-        redraw();
-    </script>
-</body>
-</html>
+  );
+};
+
+export default SimpleDashboard;
